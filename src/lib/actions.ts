@@ -75,7 +75,6 @@ export async function handleUserMessage(
             \n**Check-in:** ${new Date(checkIn).toLocaleDateString()}
             \n**Check-out:** ${new Date(checkOut).toLocaleDateString()}
             \n\nA confirmation email has been sent.`,
-            quickReplies: ['Cancel Booking'],
             bookingDetails: { ...newMessage.bookingDetails, bookingId },
         };
     }

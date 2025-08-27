@@ -1,6 +1,6 @@
 'use client';
 
-import { RotateCw, Download, Moon, Sun } from 'lucide-react';
+import { RotateCw, Download, Moon, Sun, XCircle } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,26 +10,50 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import type { Message } from '@/lib/types';
+import { useMemo } from 'react';
 
-export function ChatHeader({ resetChat, messages }: { resetChat: () => void; messages: Message[] }) {
+export function ChatHeader({
+  resetChat,
+  messages,
+  onCancelBooking,
+}: {
+  resetChat: () => void;
+  messages: Message[];
+  onCancelBooking: () => void;
+}) {
   const { setTheme } = useTheme();
 
+  const hasBooking = useMemo(
+    () => messages.some((m) => m.bookingDetails?.bookingId),
+    [messages]
+  );
+
   const downloadChat = () => {
-     const chatText = messages.map(msg => `${msg.role === 'user' ? 'You' : 'Bot'}: ${msg.content.replace(/<br>/g, '\n').replace(/<strong>/g, '').replace(/<\/strong>/g, '')}`).join('\n\n');
-      const blob = new Blob([chatText], { type: 'text/plain' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'RoamWell_Chat_History.txt';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+    const chatText = messages
+      .map(
+        (msg) =>
+          `${msg.role === 'user' ? 'You' : 'Bot'}: ${msg.content
+            .replace(/<br>/g, '\n')
+            .replace(/<strong>/g, '')
+            .replace(/<\/strong>/g, '')}`
+      )
+      .join('\n\n');
+    const blob = new Blob([chatText], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'RoamWell_Chat_History.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   return (
     <header className="flex h-20 shrink-0 items-center justify-between border-b bg-primary/10 px-4 md:px-6">
       <div className="text-primary">
         <h1 className="text-xl font-bold tracking-tighter">🏨 RoamWell AI</h1>
-        <p className="text-sm text-primary/80">Your guide to finding the perfect stay</p>
+        <p className="text-sm text-primary/80">
+          Your guide to finding the perfect stay
+        </p>
       </div>
       <div className="flex items-center gap-2">
         <DropdownMenu>
@@ -41,17 +65,45 @@ export function ChatHeader({ resetChat, messages }: { resetChat: () => void; mes
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => setTheme('light')}>Light</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setTheme('dark')}>Dark</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setTheme('system')}>System</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme('light')}>
+              Light
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme('dark')}>
+              Dark
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme('system')}>
+              System
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <Button variant="ghost" size="icon" onClick={downloadChat} title="Download Chat">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={downloadChat}
+          title="Download Chat"
+        >
           <Download className="h-5 w-5" />
           <span className="sr-only">Download Chat</span>
         </Button>
-        <Button variant="ghost" size="icon" onClick={resetChat} title="Reset Chat">
+        {hasBooking && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onCancelBooking}
+            title="Cancel Booking"
+            className="text-destructive hover:text-destructive"
+          >
+            <XCircle className="h-5 w-5" />
+            <span className="sr-only">Cancel Booking</span>
+          </Button>
+        )}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={resetChat}
+          title="Reset Chat"
+        >
           <RotateCw className="h-5 w-5" />
           <span className="sr-only">Reset Chat</span>
         </Button>

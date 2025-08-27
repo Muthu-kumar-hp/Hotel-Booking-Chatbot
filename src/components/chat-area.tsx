@@ -63,9 +63,30 @@ export function ChatArea() {
     setMessages([initialMessage]);
   };
 
+  const handleCancelBooking = () => {
+    const lastBooking = [...messages]
+      .reverse()
+      .find((m) => m.bookingDetails?.bookingId);
+
+    if (lastBooking && lastBooking.bookingDetails?.bookingId) {
+      handleSend(
+        `Cancel booking ${lastBooking.bookingDetails.bookingId}`
+      );
+    } else {
+      toast({
+        title: 'No active booking found',
+        description: 'There are no bookings in the current session to cancel.',
+      });
+    }
+  };
+
   return (
     <div className="chat-container">
-      <ChatHeader resetChat={resetChat} messages={messages} />
+      <ChatHeader
+        resetChat={resetChat}
+        messages={messages}
+        onCancelBooking={handleCancelBooking}
+      />
       <ChatMessages
         messages={messages}
         isLoading={isLoading}
