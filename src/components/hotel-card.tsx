@@ -71,7 +71,7 @@ export function HotelCard({ hotel, reason, onQuickReply }: HotelCardProps) {
 
 export function HotelDetailCard({ hotel, onQuickReply }: HotelCardProps) {
   const handleBookNow = () => {
-    onQuickReply(`Book a room at ${hotel.name}`);
+    onQuickReply(`How to book ${hotel.name}`);
   };
 
   return (

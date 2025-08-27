@@ -13,7 +13,7 @@ const intents_data: Record<string, { patterns: string[] }> = {
     find_hotels: { patterns: ["show me hotels in", "find me hotels in", "hotels in", "looking for a hotel in", "want a room in", "cheap hotel", "luxury hotel", "high-rated hotel"] },
     view_details: { patterns: ["view details for", "details of", "tell me more about", "more details"] },
     suggest_hotel: { patterns: ["suggest a hotel", "what do you recommend", "cheap and best", "recommend a hotel", "best hotels", "suggestion", "give me a suggestion"] },
-    book_hotel: { patterns: ["book a room", "book the hotel", "i want to book", "booking"] },
+    book_hotel: { patterns: ["book a room", "book the hotel", "i want to book", "booking", "proceed to book"] },
     booking_procedure: { patterns: ["how to book", "booking procedure", "what is the booking process", "how do i book a hotel", "procedure"] },
     ask_question: { patterns: ["what is", "what are", "do you have", "can you tell me", "is there a", "how much"] },
     submit_feedback: { patterns: ["⭐", "⭐⭐", "⭐⭐⭐", "⭐⭐⭐⭐", "⭐⭐⭐⭐⭐"] },
@@ -191,14 +191,27 @@ export async function handleUserMessage(
         }
 
         case 'booking_procedure':
-            return {
-                content: `Of course! Here is the booking procedure:
+            const hotelName = query.replace('how to book','').trim();
+            const hotel = hotel_info_data.find(h => h.name.toLowerCase() === hotelName);
+
+            let procedureText = `Of course! Here is the booking procedure:
 1.  **Find a hotel:** You can ask me to find hotels in a specific city (Salem, Chennai, or Ooty) or ask for a suggestion.
 2.  **View Details:** Click the "View Details" button on any hotel card to see more information about it.
 3.  **Book Now:** On the details page, click the "Book Now" button.
 4.  **Fill the Form:** I will show you a booking form. Please fill in your details.
-5.  **Confirm:** Once you submit the form, your booking will be confirmed!`,
-                quickReplies: ['Find hotels in Chennai', 'Suggest a hotel']
+5.  **Confirm:** Once you submit the form, your booking will be confirmed!`;
+            
+            let quickReplies = ['Find hotels in Chennai', 'Suggest a hotel'];
+
+            if(hotel) {
+                procedureText += `\n\nWould you like to proceed with booking a room at **${hotel.name}**?`;
+                quickReplies = [`Yes, proceed to book ${hotel.name}`];
+            }
+
+
+            return {
+                content: procedureText,
+                quickReplies: quickReplies
             };
         
         case 'ask_question': {
@@ -243,7 +256,7 @@ export async function handleUserMessage(
         case 'book_restaurant':
             return {
                 content: "Excellent choice! Your table has been reserved. You will receive a confirmation from the restaurant soon. Can I help with anything else?",
-                quickReplies: ['Book a Taxi', 'Explore Sightseeing']
+                quickies: ['Book a Taxi', 'Explore Sightseeing']
             };
 
         case 'loyalty_program':
