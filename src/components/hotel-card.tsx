@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, BedDouble } from 'lucide-react';
+import { MapPin, BedDouble, Star } from 'lucide-react';
 import Link from 'next/link';
 
 interface HotelCardProps {
@@ -75,6 +75,10 @@ export function HotelDetailCard({ hotel, onQuickReply }: HotelCardProps) {
     onQuickReply(`how to book the ${hotel.name}`);
   };
 
+  const handleNearby = () => {
+    onQuickReply(`What's nearby ${hotel.name}?`);
+  };
+
   return (
     <div className="bg-card rounded-lg overflow-hidden flex flex-col gap-4 p-4">
         <div className="relative h-56 w-full rounded-md overflow-hidden">
@@ -109,10 +113,16 @@ export function HotelDetailCard({ hotel, onQuickReply }: HotelCardProps) {
         <div className="text-2xl font-bold mt-2">
             ${hotel.price} <span className="text-sm font-normal text-muted-foreground">/ night</span>
         </div>
-         <Button onClick={handleBookNow} size="lg">
-            <BedDouble className="mr-2 h-5 w-5" />
-            Book Now
-        </Button>
+        <div className="grid grid-cols-2 gap-2">
+            <Button onClick={handleNearby} variant="outline">
+                <Star className="mr-2 h-5 w-5" />
+                What's nearby?
+            </Button>
+            <Button onClick={handleBookNow} size="lg">
+                <BedDouble className="mr-2 h-5 w-5" />
+                Book Now
+            </Button>
+        </div>
     </div>
   )
 }

@@ -6,6 +6,7 @@ import type { Message, Hotel } from './types';
 import { suggestHotel } from '@/ai/flows/suggest-hotel';
 import { answerHotelQuestion } from '@/ai/flows/answer-hotel-question';
 import { suggestUpsell } from '@/ai/flows/suggest-upsell';
+import { suggestAttractions } from '@/ai/flows/suggest-attractions';
 import { hotel_info_data } from './data';
 
 const intents_data: Record<string, { patterns: string[] }> = {
@@ -22,6 +23,7 @@ const intents_data: Record<string, { patterns: string[] }> = {
     book_sightseeing: { patterns: ["explore sightseeing", "sightseeing tours", "tourist spots"] },
     book_restaurant: { patterns: ["reserve a table", "restaurant booking", "book a restaurant"] },
     loyalty_program: { patterns: ["loyalty program", "rewards", "points", "membership benefits"] },
+    nearby_attractions: { patterns: ["what's nearby", "nearby attractions", "tourist spots near", "restaurants near", "shopping near"] },
 };
 
 function findBestIntent(message: string): string {
@@ -267,6 +269,46 @@ export async function handleUserMessage(
 \n\nWhat would you like to do next?`,
                 quickReplies: ['Find hotels in Salem', 'Suggest a hotel'],
             };
+        
+        case 'nearby_attractions': {
+            const hotelNameMatch = query.match(/nearby (.*)/) || query.match(/near (.*)/);
+            let hotelName = hotelNameMatch ? hotelNameMatch[1].replace('?','').trim() : '';
+
+            let hotel: Hotel | undefined;
+
+            if (hotelName) {
+                hotel = hotel_info_data.find(h => h.name.toLowerCase() === hotelName);
+            } else {
+                 const lastMessage = history[history.length - 1];
+                 if (lastMessage?.hotelData && lastMessage.hotelData.length === 1) {
+                    const hotelData = lastMessage.hotelData[0];
+                    hotel = 'hotel' in hotelData ? hotelData.hotel : hotelData;
+                }
+            }
+
+            if (!hotel) {
+                return { content: "I'm not sure which hotel you're asking about. Please view the details of a hotel first." };
+            }
+
+            try {
+                const result = await suggestAttractions({
+                    hotelName: hotel.name,
+                    city: hotel.city,
+                });
+                
+                const attractionsText = result.attractions.map(attr => 
+                    `**${attr.name} (${attr.type.replace('_', ' ')})**\n${attr.description}`
+                ).join('\n\n');
+
+                return { 
+                    content: `Here are some popular spots near **${hotel.name}**:\n\n${attractionsText}`
+                };
+
+            } catch (e) {
+                console.error('Attraction suggestion failed', e);
+                return { content: 'Sorry, I am having trouble finding nearby attractions right now.' };
+            }
+        }
 
         default:
              if (query.includes('rate my experience')) {
