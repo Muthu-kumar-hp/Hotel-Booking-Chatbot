@@ -1,6 +1,6 @@
 'use client';
 
-import { RotateCw, Download, Moon, Sun, XCircle } from 'lucide-react';
+import { RotateCw, Download, Moon, Sun, XCircle, FileDown } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,10 +16,12 @@ export function ChatHeader({
   resetChat,
   messages,
   onCancelBooking,
+  onDownloadBooking,
 }: {
   resetChat: () => void;
   messages: Message[];
   onCancelBooking: () => void;
+  onDownloadBooking: () => void;
 }) {
   const { setTheme } = useTheme();
 
@@ -87,16 +89,27 @@ export function ChatHeader({
           <span className="sr-only">Download Chat</span>
         </Button>
         {hasBooking && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onCancelBooking}
-            title="Cancel Booking"
-            className="text-destructive hover:text-destructive"
-          >
-            <XCircle className="h-5 w-5" />
-            <span className="sr-only">Cancel Booking</span>
-          </Button>
+          <>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onDownloadBooking}
+              title="Download Booking Receipt"
+            >
+              <FileDown className="h-5 w-5" />
+              <span className="sr-only">Download Booking Receipt</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onCancelBooking}
+              title="Cancel Booking"
+              className="text-destructive hover:text-destructive"
+            >
+              <XCircle className="h-5 w-5" />
+              <span className="sr-only">Cancel Booking</span>
+            </Button>
+          </>
         )}
         <Button
           variant="ghost"

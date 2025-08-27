@@ -80,12 +80,57 @@ export function ChatArea() {
     }
   };
 
+  const handleDownloadBooking = () => {
+    const lastBooking = [...messages]
+      .reverse()
+      .find((m) => m.bookingDetails?.bookingId);
+
+    if (lastBooking && lastBooking.bookingDetails) {
+      const { bookingId, hotel, guests, checkIn, checkOut, name, email } =
+        lastBooking.bookingDetails;
+      const hotelName = 'hotel' in hotel ? hotel.hotel.name : hotel.name;
+      const hotelAddress = 'hotel' in hotel ? hotel.hotel.address : hotel.address;
+
+      const receiptContent = `
+Booking Receipt
+----------------
+
+Booking ID: ${bookingId}
+Hotel: ${hotelName}
+Address: ${hotelAddress}
+
+Guest Name: ${name}
+Guest Email: ${email}
+
+Check-in: ${new Date(checkIn).toLocaleDateString()}
+Check-out: ${new Date(checkOut).toLocaleDateString()}
+Number of Guests: ${guests}
+
+Thank you for booking with RoamWell AI!
+      `;
+
+      const blob = new Blob([receiptContent], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `RoamWell_Booking_${bookingId}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } else {
+      toast({
+        title: 'No booking to download',
+        description: 'Please make a booking first.',
+      });
+    }
+  };
+
   return (
     <div className="chat-container">
       <ChatHeader
         resetChat={resetChat}
         messages={messages}
         onCancelBooking={handleCancelBooking}
+        onDownloadBooking={handleDownloadBooking}
       />
       <ChatMessages
         messages={messages}
