@@ -13,6 +13,7 @@ const intents_data: Record<string, { patterns: string[] }> = {
     book_hotel: { patterns: ["book a room", "book the hotel", "i want to book", "booking"] },
     booking_procedure: { patterns: ["how to book", "booking procedure", "what is the booking process", "how do i book a hotel"] },
     ask_question: { patterns: ["what is", "what are", "do you have", "can you tell me", "is there a", "how much"] },
+    submit_feedback: { patterns: ["⭐", "⭐⭐", "⭐⭐⭐", "⭐⭐⭐⭐", "⭐⭐⭐⭐⭐"] },
     cancel_booking: { patterns: ["cancel booking", "cancel my booking"] },
 };
 
@@ -68,8 +69,10 @@ export async function handleUserMessage(
             \n**Guests:** ${guests}
             \n**Check-in:** ${new Date(checkIn).toLocaleDateString()}
             \n**Check-out:** ${new Date(checkOut).toLocaleDateString()}
-            \n\nA confirmation email has been sent. You can cancel or download your booking using the buttons in the header.`,
+            \n\nA confirmation email has been sent. You can cancel or download your booking using the buttons in the header.
+            \n\nHow would you rate your experience?`,
             bookingDetails: { ...newMessage.bookingDetails, bookingId },
+            quickReplies: ['⭐', '⭐⭐', '⭐⭐⭐', '⭐⭐⭐⭐', '⭐⭐⭐⭐⭐'],
         };
     }
 
@@ -212,7 +215,11 @@ export async function handleUserMessage(
             }
             return { content: "I'm not sure which hotel you're asking about. Please view the details of a hotel first." };
         }
-
+        
+        case 'submit_feedback':
+            return {
+                content: "Thanks for your feedback! I'm glad I could help. Is there anything else you need?"
+            };
 
         default:
             return { content: "I'm sorry, I can't help with that. I can help find, book, or suggest hotels in Salem, Chennai, and Ooty. How can I help?" };
