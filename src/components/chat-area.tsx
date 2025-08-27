@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import type { User } from 'firebase/auth';
+import { useState } from 'react';
 import type { Message } from '@/lib/types';
 import { handleUserMessage, confirmBooking } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
@@ -16,7 +15,7 @@ const initialMessage: Message = {
   \n\nWhat city are you interested in? Or, would you like a **suggestion**?`,
 };
 
-export function ChatArea({ user }: { user: User }) {
+export function ChatArea() {
   const [messages, setMessages] = useState<Message[]>([initialMessage]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -60,7 +59,7 @@ export function ChatArea({ user }: { user: User }) {
   const handleBooking = async (bookingData: any) => {
     setIsLoading(true);
     try {
-        const result = await confirmBooking({ ...bookingData, userId: user.uid });
+        const result = await confirmBooking(bookingData);
         if (result.success) {
             toast({
                 title: 'Booking Confirmed!',

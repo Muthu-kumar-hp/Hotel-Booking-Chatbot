@@ -35,5 +35,4 @@ export interface Booking {
   customerPhone: string;
   bookingId: string;
   timestamp: Date;
-  userId: string;
 }
