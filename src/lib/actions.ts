@@ -11,6 +11,7 @@ const intents_data: Record<string, { patterns: string[] }> = {
     view_details: { patterns: ["view details for", "details of", "tell me more about", "more details"] },
     suggest_hotel: { patterns: ["suggest a hotel", "what do you recommend", "cheap and best", "recommend a hotel", "best hotels", "luxury hotel", "cheap hotel", "high-rated hotel", "suggestion"] },
     book_hotel: { patterns: ["book a room", "book the hotel", "i want to book", "booking"] },
+    booking_procedure: { patterns: ["how to book", "booking procedure", "what is the booking process", "how do i book a hotel"] },
     ask_question: { patterns: ["what is", "what are", "do you have", "can you tell me", "is there a", "how much"] },
     cancel_booking: { patterns: ["cancel booking", "cancel my booking"] },
 };
@@ -120,6 +121,17 @@ export async function handleUserMessage(
             }
             return { content: "Please specify which hotel you'd like to book." };
         }
+
+        case 'booking_procedure':
+            return {
+                content: `Of course! Here is the booking procedure:
+1.  **Find a hotel:** You can ask me to find hotels in a specific city (Salem, Chennai, or Ooty) or ask for a suggestion.
+2.  **View Details:** Click the "View Details" button on any hotel card to see more information about it.
+3.  **Book Now:** On the details page, click the "Book Now" button.
+4.  **Fill the Form:** I will show you a booking form. Please fill in your details.
+5.  **Confirm:** Once you submit the form, your booking will be confirmed!`,
+                quickReplies: ['Find hotels in Chennai', 'Suggest a hotel']
+            };
 
         case 'suggest_hotel': {
             try {
