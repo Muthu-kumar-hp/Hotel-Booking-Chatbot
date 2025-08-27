@@ -10,10 +10,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import type { Message } from '@/lib/types';
-import { useToast } from '@/hooks/use-toast';
 
 export function ChatHeader({ resetChat, messages }: { resetChat: () => void; messages: Message[] }) {
-  const { toast } = useToast();
   const { setTheme } = useTheme();
 
   const downloadChat = () => {
