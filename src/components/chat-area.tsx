@@ -107,7 +107,7 @@ Check-out: ${new Date(checkOut).toLocaleDateString()}
 Number of Guests: ${guests}
 
 Thank you for booking with RoamWell AI!
-      `;
+      `.trim();
 
       const blob = new Blob([receiptContent], { type: 'text/plain' });
       const a = document.createElement('a');
