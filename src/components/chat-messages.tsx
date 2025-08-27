@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useRef } from 'react';
@@ -30,8 +31,11 @@ export function ChatMessages({
   }, [messages, isLoading]);
 
   const handleBookingSubmit = (formData: any, hotelData: any) => {
-    const bookingDetails = `Booking confirmed for ${formData.guests} guest(s) from ${formData.checkIn} to ${formData.checkOut}.`;
-    onQuickReply(bookingDetails, true, { ...formData, hotel: hotelData });
+    const checkInDate = formData.checkIn instanceof Date ? formData.checkIn.toISOString() : formData.checkIn;
+    const checkOutDate = formData.checkOut instanceof Date ? formData.checkOut.toISOString() : formData.checkOut;
+
+    const bookingDetails = `Booking confirmed for ${formData.guests} guest(s) from ${new Date(checkInDate).toLocaleDateString()} to ${new Date(checkOutDate).toLocaleDateString()}.`;
+    onQuickReply(bookingDetails, true, { ...formData, checkIn: checkInDate, checkOut: checkOutDate, hotel: hotelData });
   };
 
   return (
