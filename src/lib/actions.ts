@@ -1,3 +1,4 @@
+
 'use server';
 
 import type { Message, Hotel } from './types';
@@ -59,7 +60,7 @@ export async function handleUserMessage(
 
     // Handle form submission
     if (newMessage.isBookingForm && newMessage.bookingDetails) {
-        const { hotel, guests, checkIn, checkOut } = newMessage.bookingDetails;
+        const { hotel, guests, checkIn, checkOut, roomType, bedSize, smoking } = newMessage.bookingDetails;
         const hotelName = 'hotel' in hotel ? hotel.hotel.name : hotel.name;
         const bookingId = `MK-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
 
@@ -69,6 +70,10 @@ export async function handleUserMessage(
             \n**Guests:** ${guests}
             \n**Check-in:** ${new Date(checkIn).toLocaleDateString()}
             \n**Check-out:** ${new Date(checkOut).toLocaleDateString()}
+            \n\n**Preferences:**
+            \n- Room Type: ${roomType}
+            \n- Bed Size: ${bedSize}
+            \n- Smoking: ${smoking ? 'Yes' : 'No'}
             \n\nA confirmation email has been sent. You can cancel or download your booking using the buttons in the header.
             \n\nHow would you rate your experience?`,
             bookingDetails: { ...newMessage.bookingDetails, bookingId },
