@@ -171,8 +171,32 @@ export async function handleUserMessage(
         }
 
         case 'booking_procedure':
-            const hotelName = query.replace('how to book','').trim();
+            let hotelName = query.replace('how to book','').replace('the','').trim();
+            if (query.includes('proceed to book')) {
+                hotelName = query.replace('yes, proceed to book','').trim();
+            }
             const hotel = hotel_info_data.find(h => h.name.toLowerCase() === hotelName);
+
+            if(hotel) {
+                try {
+                    const upsell = await suggestUpsell({
+                        hotel: hotel,
+                        currentChoice: 'a standard room'
+                    });
+                    return {
+                        content: `${upsell.suggestion}\n\nPlease fill out the form below to book your stay at **${hotel.name}**.`,
+                        isBookingForm: true,
+                        hotelData: [hotel]
+                    }
+                 } catch (e) {
+                    console.error('Upsell flow failed', e);
+                    return {
+                        content: `Please fill out the form below to book your stay at **${hotel.name}**.`,
+                        isBookingForm: true,
+                        hotelData: [hotel]
+                    };
+                 }
+            }
 
             let procedureText = `Of course! Here is the booking procedure:
 1.  **Find a hotel:** You can ask me to find hotels in a specific city (Salem, Chennai, or Ooty) or ask for a suggestion.
@@ -182,12 +206,6 @@ export async function handleUserMessage(
 5.  **Confirm:** Once you submit the form, your booking will be confirmed!`;
             
             let quickReplies = ['Find hotels in Chennai', 'Suggest a hotel'];
-
-            if(hotel) {
-                procedureText += `\n\nWould you like to proceed with booking a room at **${hotel.name}**?`;
-                quickReplies = [`Yes, proceed to book ${hotel.name}`];
-            }
-
 
             return {
                 content: procedureText,
@@ -223,20 +241,20 @@ export async function handleUserMessage(
 
         case 'book_taxi':
             return {
-                content: "Your taxi has been booked! The driver will meet you at the hotel lobby at your requested time. You will receive a confirmation SMS shortly. Is there anything else?",
+                content: "Your taxi has been booked! The driver will meet you at the hotel lobby at your requested time. You will receive a confirmation SMS shortly. \n\nWould you like to explore sightseeing or book a restaurant?",
                 quickReplies: ['Explore Sightseeing', 'Reserve a Table']
             };
 
         case 'book_sightseeing':
             return {
-                content: "Great! We have a partnership with local tour guides. A representative will contact you shortly to arrange a personalized sightseeing tour. What else can I do for you?",
+                content: "Great! We have a partnership with local tour guides. A representative will contact you shortly to arrange a personalized sightseeing tour. \n\nWould you like to book a taxi or reserve a table?",
                  quickReplies: ['Book a Taxi', 'Reserve a Table']
             };
 
         case 'book_restaurant':
             return {
-                content: "Excellent choice! Your table has been reserved. You will receive a confirmation from the restaurant soon. Can I help with anything else?",
-                quickies: ['Book a Taxi', 'Explore Sightseeing']
+                content: "Excellent choice! Your table has been reserved. You will receive a confirmation from the restaurant soon. \n\nCan I help with a taxi or sightseeing?",
+                quickReplies: ['Book a Taxi', 'Explore Sightseeing']
             };
 
         case 'loyalty_program':

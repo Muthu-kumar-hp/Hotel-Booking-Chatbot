@@ -1,3 +1,4 @@
+
 'use client';
 
 import Image from 'next/image';
@@ -71,7 +72,7 @@ export function HotelCard({ hotel, reason, onQuickReply }: HotelCardProps) {
 
 export function HotelDetailCard({ hotel, onQuickReply }: HotelCardProps) {
   const handleBookNow = () => {
-    onQuickReply(`How to book ${hotel.name}`);
+    onQuickReply(`how to book the ${hotel.name}`);
   };
 
   return (
