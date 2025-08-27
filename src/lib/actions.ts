@@ -6,7 +6,7 @@ import { hotel_info_data } from './data';
 
 const intents_data: Record<string, { patterns: string[] }> = {
     greeting: { patterns: ["hi", "hello", "hey", "greetings"] },
-    find_hotels: { patterns: ["show me hotels in", "find me hotels in", "hotels in", "looking for a hotel in", "want a room in"] },
+    find_hotels: { patterns: ["show me hotels in", "find me hotels in", "hotels in", "looking for a hotel in", "want a room in", "salem", "chennai", "ooty"] },
     view_details: { patterns: ["view details for", "details of", "tell me more about", "more details"] },
     suggest_hotel: { patterns: ["suggest a hotel", "what do you recommend", "cheap and best", "recommend a hotel", "best hotels", "luxury hotel", "cheap hotel", "high-rated hotel", "suggestion"] },
 };
