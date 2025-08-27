@@ -3,8 +3,6 @@
 import type { Message, Hotel } from './types';
 import { suggestHotel } from '@/ai/flows/suggest-hotel';
 import { hotel_info_data } from './data';
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
-import { app } from './firebase';
 
 const intents_data: Record<string, { patterns: string[] }> = {
     greeting: { patterns: ["hi", "hello", "hey", "greetings"] },
@@ -130,6 +128,8 @@ export async function handleUserMessage(
 }
 
 export async function confirmBooking(bookingData: Omit<any, 'id' | 'timestamp' | 'bookingId'>) {
+    const { getFirestore, collection, addDoc } = await import('firebase/firestore');
+    const { app } = await import('./firebase');
     try {
         const db = getFirestore(app);
         const appId = process.env.NEXT_PUBLIC_FIREBASE_APP_ID || 'default-app-id';
