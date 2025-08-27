@@ -3,6 +3,22 @@
 import type { Message, Hotel } from './types';
 import { suggestHotel } from '@/ai/flows/suggest-hotel';
 import { hotel_info_data } from './data';
+import { initializeApp, getApps, getApp } from 'firebase/app';
+import { getFirestore, collection, addDoc } from 'firebase/firestore';
+
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+};
+
+function getFirebaseApp() {
+    return !getApps().length ? initializeApp(firebaseConfig) : getApp();
+}
+
 
 const intents_data: Record<string, { patterns: string[] }> = {
     greeting: { patterns: ["hi", "hello", "hey", "greetings"] },
@@ -128,9 +144,8 @@ export async function handleUserMessage(
 }
 
 export async function confirmBooking(bookingData: Omit<any, 'id' | 'timestamp' | 'bookingId'>) {
-    const { getFirestore, collection, addDoc } = await import('firebase/firestore');
-    const { app } = await import('./firebase');
     try {
+        const app = getFirebaseApp();
         const db = getFirestore(app);
         const appId = process.env.NEXT_PUBLIC_FIREBASE_APP_ID || 'default-app-id';
         const bookingsCollectionRef = collection(db, `artifacts/${appId}/public/data/bookings`);
