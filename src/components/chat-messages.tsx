@@ -4,8 +4,7 @@ import { useEffect, useRef } from 'react';
 import type { Message } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { HotelCard } from './hotel-card';
-import { BookingForm } from './booking-form';
+import { HotelCard, HotelDetailCard } from './hotel-card';
 import { Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
@@ -13,14 +12,12 @@ interface ChatMessagesProps {
   messages: Message[];
   isLoading: boolean;
   onQuickReply: (text: string) => void;
-  onBookHotel: (bookingData: any) => void;
 }
 
 export function ChatMessages({
   messages,
   isLoading,
   onQuickReply,
-  onBookHotel,
 }: ChatMessagesProps) {
   const scrollableContainerRef = useRef<HTMLDivElement>(null);
 
@@ -71,6 +68,12 @@ export function ChatMessages({
                   {m.hotelData.map((data, index) => {
                     const hotel = 'hotel' in data ? data.hotel : data;
                     const reason = 'reason' in data ? data.reason : undefined;
+                    
+                    // If there's only one hotel and no reason, it's a detail view
+                    if (m.hotelData?.length === 1 && !reason) {
+                       return <HotelDetailCard key={`${hotel.id}-${index}`} hotel={hotel} onQuickReply={onQuickReply} />
+                    }
+
                     return (
                       <HotelCard
                         key={`${hotel.id}-${index}`}
@@ -81,10 +84,6 @@ export function ChatMessages({
                     );
                   })}
                 </div>
-              )}
-
-              {m.isBookingForm && m.hotelData && (
-                 <BookingForm hotel={m.hotelData[0]} onBookHotel={onBookHotel} />
               )}
             </div>
           </div>

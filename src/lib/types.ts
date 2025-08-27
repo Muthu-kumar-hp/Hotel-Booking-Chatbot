@@ -22,17 +22,3 @@ export interface Message {
   hotelData?: (Hotel | { hotel: Hotel; reason: string })[];
   isBookingForm?: boolean;
 }
-
-export interface Booking {
-  id: string;
-  hotelName: string;
-  hotelCity: string;
-  hotelPrice: number;
-  checkinDate: string;
-  checkoutDate: string;
-  customerName: string;
-  customerEmail: string;
-  customerPhone: string;
-  bookingId: string;
-  timestamp: Date;
-}
