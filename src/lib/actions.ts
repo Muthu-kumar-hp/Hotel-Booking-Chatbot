@@ -16,6 +16,9 @@ const intents_data: Record<string, { patterns: string[] }> = {
     ask_question: { patterns: ["what is", "what are", "do you have", "can you tell me", "is there a", "how much"] },
     submit_feedback: { patterns: ["⭐", "⭐⭐", "⭐⭐⭐", "⭐⭐⭐⭐", "⭐⭐⭐⭐⭐"] },
     cancel_booking: { patterns: ["cancel booking", "cancel my booking"] },
+    book_taxi: { patterns: ["book a taxi", "taxi service", "airport transfer"] },
+    book_sightseeing: { patterns: ["explore sightseeing", "sightseeing tours", "tourist spots"] },
+    book_restaurant: { patterns: ["reserve a table", "restaurant booking", "book a restaurant"] },
 };
 
 function findBestIntent(message: string): string {
@@ -75,9 +78,9 @@ export async function handleUserMessage(
             \n- Bed Size: ${bedSize}
             \n- Smoking: ${smoking ? 'Yes' : 'No'}
             \n\nA confirmation email has been sent. You can cancel or download your booking using the buttons in the header.
-            \n\nHow would you rate your experience?`,
+            \n\nWhile you're here, would you like help with any travel add-ons? I can also help you rate your experience.`,
             bookingDetails: { ...newMessage.bookingDetails, bookingId },
-            quickReplies: ['⭐', '⭐⭐', '⭐⭐⭐', '⭐⭐⭐⭐', '⭐⭐⭐⭐⭐'],
+            quickReplies: ['Book a Taxi', 'Explore Sightseeing', 'Reserve a Table', 'Rate my experience'],
         };
     }
 
@@ -222,11 +225,42 @@ export async function handleUserMessage(
         }
         
         case 'submit_feedback':
+        case 'rate_experience':
+             return {
+                content: "How would you rate your experience?",
+                quickReplies: ['⭐', '⭐⭐', '⭐⭐⭐', '⭐⭐⭐⭐', '⭐⭐⭐⭐⭐'],
+            };
+
+        case 'book_taxi':
             return {
-                content: "Thanks for your feedback! I'm glad I could help. Is there anything else you need?"
+                content: "Your taxi has been booked! The driver will meet you at the hotel lobby at your requested time. You will receive a confirmation SMS shortly. Is there anything else?",
+                quickReplies: ['Explore Sightseeing', 'Reserve a Table']
+            };
+
+        case 'book_sightseeing':
+            return {
+                content: "Great! We have a partnership with local tour guides. A representative will contact you shortly to arrange a personalized sightseeing tour. What else can I do for you?",
+                 quickReplies: ['Book a Taxi', 'Reserve a Table']
+            };
+
+        case 'book_restaurant':
+            return {
+                content: "Excellent choice! Your table has been reserved. You will receive a confirmation from the restaurant soon. Can I help with anything else?",
+                quickReplies: ['Book a Taxi', 'Explore Sightseeing']
             };
 
         default:
+             if (query.includes('rate my experience')) {
+                return {
+                    content: "Of course, how would you rate your experience?",
+                    quickReplies: ['⭐', '⭐⭐', '⭐⭐⭐', '⭐⭐⭐⭐', '⭐⭐⭐⭐⭐'],
+                };
+            }
+            if (['⭐', '⭐⭐', '⭐⭐⭐', '⭐⭐⭐⭐', '⭐⭐⭐⭐⭐'].includes(newMessage.content)) {
+                return {
+                    content: "Thanks for your feedback! I'm glad I could help. Is there anything else you need?"
+                };
+            }
             return { content: "I'm sorry, I can't help with that. I can help find, book, or suggest hotels in Salem, Chennai, and Ooty. How can I help?" };
     }
 }
