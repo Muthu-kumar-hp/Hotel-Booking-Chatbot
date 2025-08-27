@@ -9,6 +9,7 @@ const intents_data: Record<string, { patterns: string[] }> = {
     find_hotels: { patterns: ["show me hotels in", "find me hotels in", "hotels in", "looking for a hotel in", "want a room in", "salem", "chennai", "ooty"] },
     view_details: { patterns: ["view details for", "details of", "tell me more about", "more details"] },
     suggest_hotel: { patterns: ["suggest a hotel", "what do you recommend", "cheap and best", "recommend a hotel", "best hotels", "luxury hotel", "cheap hotel", "high-rated hotel", "suggestion"] },
+    book_hotel: { patterns: ["book a room", "book the hotel", "i want to book", "booking"] }
 };
 
 function findBestIntent(message: string): string {
@@ -47,6 +48,13 @@ export async function handleUserMessage(
     const intent = findBestIntent(newMessage.content);
     const query = newMessage.content.toLowerCase();
 
+    // Handle form submission
+    if (newMessage.isBookingForm) {
+        return {
+            content: `Thank you! Your booking has been confirmed. A confirmation email has been sent to you.`,
+        };
+    }
+
     switch (intent) {
         case 'greeting':
             return { content: 'Hello there! How can I help you with your hotel search today?' };
@@ -80,6 +88,18 @@ export async function handleUserMessage(
                 };
             }
             return { content: "I couldn't find that hotel. Please select one from a list." };
+        }
+
+        case 'book_hotel': {
+             const hotel = hotel_info_data.find(h => query.includes(h.name.toLowerCase()));
+             if (hotel) {
+                return {
+                    content: `Please fill out the form below to book your stay at **${hotel.name}**.`,
+                    isBookingForm: true,
+                    hotelData: [hotel]
+                };
+            }
+            return { content: "Please specify which hotel you'd like to book." };
         }
 
         case 'suggest_hotel': {

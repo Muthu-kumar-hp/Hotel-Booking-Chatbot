@@ -5,13 +5,14 @@ import type { Message } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { HotelCard, HotelDetailCard } from './hotel-card';
+import { BookingForm } from './booking-form';
 import { Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 interface ChatMessagesProps {
   messages: Message[];
   isLoading: boolean;
-  onQuickReply: (text: string) => void;
+  onQuickReply: (text: string, isBooking?: boolean) => void;
 }
 
 export function ChatMessages({
@@ -26,6 +27,11 @@ export function ChatMessages({
       scrollableContainerRef.current.scrollTop = scrollableContainerRef.current.scrollHeight;
     }
   }, [messages, isLoading]);
+
+  const handleBookingSubmit = (formData: any) => {
+    const bookingDetails = `Booking confirmed for ${formData.guests} guest(s) from ${formData.checkIn} to ${formData.checkOut}.`;
+    onQuickReply(bookingDetails, true);
+  };
 
   return (
     <div
@@ -63,13 +69,16 @@ export function ChatMessages({
                 {m.content}
               </ReactMarkdown>
 
-              {m.hotelData && (
+              {m.isBookingForm && m.hotelData && (
+                <BookingForm hotel={m.hotelData[0]} onSubmit={handleBookingSubmit} />
+              )}
+
+              {m.hotelData && !m.isBookingForm &&(
                 <div className="mt-2 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {m.hotelData.map((data, index) => {
                     const hotel = 'hotel' in data ? data.hotel : data;
                     const reason = 'reason' in data ? data.reason : undefined;
                     
-                    // If there's only one hotel and no reason, it's a detail view
                     if (m.hotelData?.length === 1 && !reason) {
                        return <HotelDetailCard key={`${hotel.id}-${index}`} hotel={hotel} onQuickReply={onQuickReply} />
                     }
