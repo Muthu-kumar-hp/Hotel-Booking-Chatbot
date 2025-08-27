@@ -8,7 +8,7 @@ const intents_data: Record<string, { patterns: string[] }> = {
     greeting: { patterns: ["hi", "hello", "hey", "greetings"] },
     find_hotels: { patterns: ["show me hotels in", "find me hotels in", "hotels in", "looking for a hotel in", "want a room in"] },
     view_details: { patterns: ["view details for", "details of", "tell me more about", "more details"] },
-    suggest_hotel: { patterns: ["suggest a hotel", "what do you recommend", "cheap and best", "recommend a hotel", "best hotels", "luxury hotel", "cheap hotel", "high-rated hotel"] },
+    suggest_hotel: { patterns: ["suggest a hotel", "what do you recommend", "cheap and best", "recommend a hotel", "best hotels", "luxury hotel", "cheap hotel", "high-rated hotel", "suggestion"] },
 };
 
 function findBestIntent(message: string): string {
@@ -98,6 +98,10 @@ export async function handleUserMessage(
                     return hotel ? { hotel, reason: s.reason } : null;
                 }).filter((s): s is { hotel: Hotel, reason: string } => s !== null);
 
+                if (suggestionData.length === 0) {
+                    return { content: "I couldn't find any hotels matching your preferences in my data. Perhaps try a different preference?" };
+                }
+                
                 return {
                     content: 'Here are a few suggestions I think you might like:',
                     hotelData: suggestionData,
