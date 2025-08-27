@@ -12,7 +12,8 @@ const initialMessage: Message = {
   id: 'initial',
   role: 'assistant',
   content: `👋 Hello! I'm your hotel search assistant. I can help you find hotels in Salem, Chennai, and Ooty.
-  \n\nWhat city are you interested in? Or, would you like a **suggestion**?`,
+  \n\nWhat city are you interested in? Or, would you like a suggestion?`,
+  quickReplies: ['Give me a suggestion'],
 };
 
 export function ChatArea() {
