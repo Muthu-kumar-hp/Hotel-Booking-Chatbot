@@ -18,7 +18,8 @@ const intents_data: Record<string, { patterns: string[] }> = {
     book_hotel: { patterns: ["book a room", "book the hotel", "i want to book", "booking", "proceed to book"] },
     booking_procedure: { patterns: ["how to book", "booking procedure", "what is the booking process", "how do i book a hotel", "procedure"] },
     ask_question: { patterns: ["what is", "what are", "do you have", "can you tell me", "is there a", "how much"] },
-    submit_feedback: { patterns: ["⭐", "⭐⭐", "⭐⭐⭐", "⭐⭐⭐⭐", "⭐⭐⭐⭐⭐"] },
+    rate_experience: { patterns: ["rate my experience", "rate your experience", "submit feedback"] },
+    submit_feedback: { patterns: ["⭐"] },
     cancel_booking: { patterns: ["cancel booking", "cancel my booking"] },
     book_taxi: { patterns: ["book a taxi", "taxi service", "airport transfer"] },
     book_sightseeing: { patterns: ["explore sightseeing", "sightseeing tours", "tourist spots"] },
@@ -236,6 +237,10 @@ export async function handleUserMessage(
         }
         
         case 'submit_feedback':
+            return {
+                content: "Thanks for your feedback! I'm glad I could help. Is there anything else you need?"
+            };
+
         case 'rate_experience':
              return {
                 content: "How would you rate your experience?",
@@ -350,17 +355,6 @@ export async function handleUserMessage(
 
 
         default:
-             if (query.includes('rate my experience')) {
-                return {
-                    content: "Of course, how would you rate your experience?",
-                    quickReplies: ['⭐', '⭐⭐', '⭐⭐⭐', '⭐⭐⭐⭐', '⭐⭐⭐⭐⭐'],
-                };
-            }
-            if (['⭐', '⭐⭐', '⭐⭐⭐', '⭐⭐⭐⭐', '⭐⭐⭐⭐⭐'].includes(newMessage.content)) {
-                return {
-                    content: "Thanks for your feedback! I'm glad I could help. Is there anything else you need?"
-                };
-            }
             return { content: "I'm sorry, I can't help with that. I can help find, book, or suggest hotels in Salem, Chennai, and Ooty. How can I help?" };
     }
 }
