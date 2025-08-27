@@ -14,13 +14,16 @@ const intents_data: Record<string, { patterns: string[] }> = {
     booking_procedure: { patterns: ["how to book", "booking procedure", "what is the booking process", "how do i book a hotel"] },
     ask_question: { patterns: ["what is", "what are", "do you have", "can you tell me", "is there a", "how much"] },
     cancel_booking: { patterns: ["cancel booking", "cancel my booking"] },
-    provide_booking_id: { patterns: ["rw-"] },
-    confirm_cancel: { patterns: ["yes, cancel my booking", "yes cancel"] },
+    confirm_cancel: { patterns: ["yes, cancel my booking", "yes cancel booking", "yes, cancel booking"] },
     deny_cancel: { patterns: ["no, don't cancel", "do not cancel", "keep my booking"] },
+    provide_booking_id: { patterns: ["rw-"] },
 };
 
 function findBestIntent(message: string): string {
     const cleanedMessage = message.toLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, "").trim();
+    if (intents_data.provide_booking_id.patterns.some(pattern => cleanedMessage.startsWith(pattern))) {
+        return 'provide_booking_id';
+    }
     for (const intent in intents_data) {
         if (intents_data[intent].patterns.some(pattern => cleanedMessage.startsWith(pattern))) {
             return intent;
@@ -103,7 +106,9 @@ export async function handleUserMessage(
         }
         
         case 'confirm_cancel': {
-            const bookingId = newMessage.content.split(' ').pop()?.toUpperCase();
+            const bookingIdMatch = newMessage.content.match(/RW-\w+/i);
+            const bookingId = bookingIdMatch ? bookingIdMatch[0].toUpperCase() : null;
+
             if (bookingId) {
                  return {
                     content: `Your booking with ID **${bookingId}** has been successfully cancelled.`
