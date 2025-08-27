@@ -7,11 +7,12 @@ import { hotel_info_data } from './data';
 
 const intents_data: Record<string, { patterns: string[] }> = {
     greeting: { patterns: ["hi", "hello", "hey", "greetings"] },
-    find_hotels: { patterns: ["show me hotels in", "find me hotels in", "hotels in", "looking for a hotel in", "want a room in", "salem", "chennai", "ooty"] },
+    find_hotels: { patterns: ["show me hotels in", "find me hotels in", "hotels in", "looking for a hotel in", "want a room in"] },
     view_details: { patterns: ["view details for", "details of", "tell me more about", "more details"] },
     suggest_hotel: { patterns: ["suggest a hotel", "what do you recommend", "cheap and best", "recommend a hotel", "best hotels", "luxury hotel", "cheap hotel", "high-rated hotel", "suggestion"] },
     book_hotel: { patterns: ["book a room", "book the hotel", "i want to book", "booking"] },
-    ask_question: { patterns: ["what is", "what are", "do you have", "can you tell me", "is there a", "how much"] }
+    ask_question: { patterns: ["what is", "what are", "do you have", "can you tell me", "is there a", "how much"] },
+    cancel_booking: { patterns: ["cancel booking", "cancel my booking"] },
 };
 
 function findBestIntent(message: string): string {
@@ -55,24 +56,34 @@ export async function handleUserMessage(
     const query = newMessage.content.toLowerCase();
 
     // Handle form submission
-    if (newMessage.isBookingForm) {
+    if (newMessage.isBookingForm && newMessage.bookingDetails) {
+        const { hotel, guests, checkIn, checkOut } = newMessage.bookingDetails;
+        const hotelName = 'hotel' in hotel ? hotel.hotel.name : hotel.name;
+
         return {
-            content: `Thank you! Your booking has been confirmed. A confirmation email has been sent to you.`,
+            content: `Thank you! Your booking for ${hotelName} for ${guests} guest(s) from ${new Date(checkIn).toLocaleDateString()} to ${new Date(checkOut).toLocaleDateString()} is confirmed. A confirmation email has been sent.`,
+            quickReplies: ['Cancel Booking']
         };
     }
 
     switch (intent) {
         case 'greeting':
             return { content: 'Hello there! How can I help you with your hotel search today?' };
+        
+        case 'cancel_booking':
+            return { content: 'Your booking has been successfully cancelled.' };
 
         case 'find_hotels': {
             const params = parseUserQuery(query);
             let hotels = hotel_info_data;
             let content = "I couldn't find any hotels matching your criteria.";
+            const cities = ['salem', 'chennai', 'ooty'];
+            const cityInQuery = cities.find(c => query.includes(c));
 
-            if (params.city) {
-                hotels = hotels.filter(h => h.city.toLowerCase() === params.city.toLowerCase());
-                content = `Here are some hotels in ${params.city}:`
+            if (params.city || cityInQuery) {
+                const targetCity = params.city || (cityInQuery ? cityInQuery.charAt(0).toUpperCase() + cityInQuery.slice(1) : '');
+                hotels = hotels.filter(h => h.city.toLowerCase() === targetCity.toLowerCase());
+                content = `Here are some hotels in ${targetCity}:`
             }
             if (params.price === 'low') hotels.sort((a, b) => a.price - b.price);
             if (params.price === 'high') hotels.sort((a, b) => b.price - a.price);
@@ -84,7 +95,7 @@ export async function handleUserMessage(
                     hotelData: hotels.slice(0, 3) // Show top 3
                 };
             }
-            return { content: content };
+            return { content: "I couldn't find any hotels in that city. I can only search for hotels in Salem, Chennai, or Ooty." };
         }
 
         case 'view_details': {

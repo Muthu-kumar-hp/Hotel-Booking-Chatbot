@@ -16,9 +16,11 @@ export interface Hotel {
 }
 
 export interface Message {
-  id: string;
+  id:string;
   role: 'user' | 'assistant' | 'system';
   content: string;
   hotelData?: (Hotel | { hotel: Hotel; reason: string })[];
   isBookingForm?: boolean;
+  quickReplies?: string[];
+  bookingDetails?: Record<string, any>;
 }

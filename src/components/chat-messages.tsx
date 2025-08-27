@@ -8,11 +8,12 @@ import { HotelCard, HotelDetailCard } from './hotel-card';
 import { BookingForm } from './booking-form';
 import { Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import { Button } from './ui/button';
 
 interface ChatMessagesProps {
   messages: Message[];
   isLoading: boolean;
-  onQuickReply: (text: string, isBooking?: boolean) => void;
+  onQuickReply: (text: string, isBooking?: boolean, bookingDetails?: any) => void;
 }
 
 export function ChatMessages({
@@ -28,9 +29,9 @@ export function ChatMessages({
     }
   }, [messages, isLoading]);
 
-  const handleBookingSubmit = (formData: any) => {
+  const handleBookingSubmit = (formData: any, hotelData: any) => {
     const bookingDetails = `Booking confirmed for ${formData.guests} guest(s) from ${formData.checkIn} to ${formData.checkOut}.`;
-    onQuickReply(bookingDetails, true);
+    onQuickReply(bookingDetails, true, { ...formData, hotel: hotelData });
   };
 
   return (
@@ -70,7 +71,7 @@ export function ChatMessages({
               </ReactMarkdown>
 
               {m.isBookingForm && m.hotelData && (
-                <BookingForm hotel={m.hotelData[0]} onSubmit={handleBookingSubmit} />
+                <BookingForm hotel={m.hotelData[0]} onSubmit={(data) => handleBookingSubmit(data, m.hotelData?.[0])} />
               )}
 
               {m.hotelData && !m.isBookingForm &&(
@@ -92,6 +93,20 @@ export function ChatMessages({
                       />
                     );
                   })}
+                </div>
+              )}
+              {m.quickReplies && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {m.quickReplies.map((reply) => (
+                    <Button
+                      key={reply}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onQuickReply(reply)}
+                    >
+                      {reply}
+                    </Button>
+                  ))}
                 </div>
               )}
             </div>

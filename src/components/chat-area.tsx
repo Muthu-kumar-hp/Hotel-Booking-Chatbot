@@ -21,7 +21,7 @@ export function ChatArea() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleSend = async (messageText: string, isBooking?: boolean) => {
+  const handleSend = async (messageText: string, isBooking?: boolean, bookingDetails?: any) => {
     if (isLoading || !messageText.trim()) return;
 
     const newUserMessage: Message = {
@@ -29,6 +29,7 @@ export function ChatArea() {
       role: 'user',
       content: messageText,
       isBookingForm: isBooking,
+      bookingDetails: bookingDetails
     };
     setMessages((prev) => [...prev, newUserMessage]);
     setIsLoading(true);
@@ -53,8 +54,8 @@ export function ChatArea() {
     }
   };
 
-  const handleQuickReply = (text: string, isBooking?: boolean) => {
-    handleSend(text, isBooking);
+  const handleQuickReply = (text: string, isBooking?: boolean, bookingDetails?: any) => {
+    handleSend(text, isBooking, bookingDetails);
   };
 
   const resetChat = () => {
