@@ -14,6 +14,8 @@ const intents_data: Record<string, { patterns: string[] }> = {
     booking_procedure: { patterns: ["how to book", "booking procedure", "what is the booking process", "how do i book a hotel"] },
     ask_question: { patterns: ["what is", "what are", "do you have", "can you tell me", "is there a", "how much"] },
     cancel_booking: { patterns: ["cancel booking", "cancel my booking"] },
+    confirm_cancel: { patterns: ["yes, cancel my booking", "yes cancel"] },
+    deny_cancel: { patterns: ["no, don't cancel", "do not cancel", "keep my booking"] },
 };
 
 function findBestIntent(message: string): string {
@@ -72,7 +74,20 @@ export async function handleUserMessage(
             return { content: 'Hello there! How can I help you with your hotel search today?' };
         
         case 'cancel_booking':
-            return { content: 'Your booking has been successfully cancelled.' };
+            return { 
+                content: 'Are you sure you want to cancel your booking?',
+                quickReplies: ['Yes, cancel my booking', 'No, don\'t cancel']
+            };
+        
+        case 'confirm_cancel':
+            return {
+                content: 'Your booking has been successfully cancelled.'
+            };
+        
+        case 'deny_cancel':
+            return {
+                content: 'Your booking has not been cancelled.'
+            };
 
         case 'find_hotels': {
             const params = parseUserQuery(query);
