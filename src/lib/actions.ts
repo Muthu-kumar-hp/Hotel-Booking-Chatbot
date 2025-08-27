@@ -2,6 +2,7 @@
 
 import type { Message, Hotel } from './types';
 import { suggestHotel } from '@/ai/flows/suggest-hotel';
+import { answerHotelQuestion } from '@/ai/flows/answer-hotel-question';
 import { hotel_info_data } from './data';
 
 const intents_data: Record<string, { patterns: string[] }> = {
@@ -9,7 +10,8 @@ const intents_data: Record<string, { patterns: string[] }> = {
     find_hotels: { patterns: ["show me hotels in", "find me hotels in", "hotels in", "looking for a hotel in", "want a room in", "salem", "chennai", "ooty"] },
     view_details: { patterns: ["view details for", "details of", "tell me more about", "more details"] },
     suggest_hotel: { patterns: ["suggest a hotel", "what do you recommend", "cheap and best", "recommend a hotel", "best hotels", "luxury hotel", "cheap hotel", "high-rated hotel", "suggestion"] },
-    book_hotel: { patterns: ["book a room", "book the hotel", "i want to book", "booking"] }
+    book_hotel: { patterns: ["book a room", "book the hotel", "i want to book", "booking"] },
+    ask_question: { patterns: ["what is", "what are", "do you have", "can you tell me", "is there a", "how much"] }
 };
 
 function findBestIntent(message: string): string {
@@ -18,6 +20,10 @@ function findBestIntent(message: string): string {
         if (intents_data[intent].patterns.some(pattern => cleanedMessage.includes(pattern))) {
             return intent;
         }
+    }
+    const cities = ['salem', 'chennai', 'ooty'];
+     if (cities.some(city => cleanedMessage.includes(city))) {
+        return 'find_hotels';
     }
     return 'fallback';
 }
@@ -62,9 +68,11 @@ export async function handleUserMessage(
         case 'find_hotels': {
             const params = parseUserQuery(query);
             let hotels = hotel_info_data;
+            let content = "I couldn't find any hotels matching your criteria.";
 
             if (params.city) {
                 hotels = hotels.filter(h => h.city.toLowerCase() === params.city.toLowerCase());
+                content = `Here are some hotels in ${params.city}:`
             }
             if (params.price === 'low') hotels.sort((a, b) => a.price - b.price);
             if (params.price === 'high') hotels.sort((a, b) => b.price - a.price);
@@ -72,11 +80,11 @@ export async function handleUserMessage(
 
             if (hotels.length > 0) {
                 return {
-                    content: `Here are some hotels matching your request in ${params.city || 'your chosen area'}:`,
+                    content: content,
                     hotelData: hotels.slice(0, 3) // Show top 3
                 };
             }
-            return { content: "Sorry, I couldn't find any hotels matching your criteria." };
+            return { content: content };
         }
 
         case 'view_details': {
@@ -131,8 +139,29 @@ export async function handleUserMessage(
                 return { content: 'Sorry, I am having trouble getting suggestions right now. Please try again later.' };
             }
         }
+        
+        case 'ask_question': {
+            const lastMessage = history[history.length - 1];
+            if (lastMessage?.hotelData && lastMessage.hotelData.length === 1) {
+                const hotelData = lastMessage.hotelData[0];
+                const hotel = 'hotel' in hotelData ? hotelData.hotel : hotelData;
+
+                try {
+                    const answer = await answerHotelQuestion({
+                        question: newMessage.content,
+                        hotelData: JSON.stringify(hotel)
+                    });
+                    return { content: answer };
+                } catch(e) {
+                     console.error('AI question answering failed', e);
+                     return { content: 'Sorry, I am having trouble answering that question right now.' };
+                }
+            }
+            return { content: "I'm not sure which hotel you're asking about. Please view the details of a hotel first." };
+        }
+
 
         default:
-            return { content: "I'm sorry, I don't understand that. I can help with finding hotels or checking amenities. Would you like a **suggestion**?" };
+            return { content: "I'm sorry, I can't help with that. I can help find, book, or suggest hotels in Salem, Chennai, and Ooty. How can I help?" };
     }
 }
