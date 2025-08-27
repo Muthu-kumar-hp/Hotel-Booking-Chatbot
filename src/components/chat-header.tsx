@@ -42,7 +42,7 @@ export function ChatHeader({
       .map(
         (msg) =>
           `${msg.role === 'user' ? 'You' : 'Bot'}: ${msg.content
-            .replace(/<br>/g, '\n')
+            ?.replace(/<br>/g, '\n')
             .replace(/<strong>/g, '')
             .replace(/<\/strong>/g, '')}`
       )

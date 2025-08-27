@@ -10,11 +10,11 @@ import { suggestAttractions } from '@/ai/flows/suggest-attractions';
 import { getWeatherForecast } from '@/ai/flows/get-weather-forecast';
 import { hotel_info_data } from './data';
 
-const intents_data: Record<string, { patterns: string[] }> = {
+const intents_data: Record<string, { patterns: string[], exact?: boolean }> = {
     greeting: { patterns: ["hi", "hello", "hey", "greetings"] },
     find_hotels: { patterns: ["show me hotels in", "find me hotels in", "hotels in", "looking for a hotel in", "want a room in", "cheap hotel", "luxury hotel", "high-rated hotel"] },
-    view_details: { patterns: ["view details for", "details of", "tell me more about", "more details"] },
-    suggest_hotel: { patterns: ["suggest a hotel", "what do you recommend", "cheap and best", "recommend a hotel", "best hotels", "suggestion", "give me a suggestion"] },
+    view_details: { patterns: ["tell me more about", "more details about", "details for", "details of"] },
+    suggest_hotel: { patterns: ["suggest a hotel", "what do you recommend", "cheap and best", "recommend a hotel", "best hotels", "suggestion", "give me a suggestion"], exact: true },
     book_hotel: { patterns: ["book a room", "book the hotel", "i want to book", "booking", "proceed to book"] },
     booking_procedure: { patterns: ["how to book", "booking procedure", "what is the booking process", "how do i book a hotel", "procedure"] },
     ask_question: { patterns: ["what is", "what are", "do you have", "can you tell me", "is there a", "how much"] },
@@ -24,7 +24,7 @@ const intents_data: Record<string, { patterns: string[] }> = {
     book_taxi: { patterns: ["book a taxi", "taxi service", "airport transfer"] },
     book_sightseeing: { patterns: ["explore sightseeing", "sightseeing tours", "tourist spots"] },
     book_restaurant: { patterns: ["reserve a table", "restaurant booking", "book a restaurant"] },
-    loyalty_program: { patterns: ["loyalty program", "rewards", "points", "membership benefits"] },
+    loyalty_program: { patterns: ["loyalty program", "rewards", "points", "membership benefits"], exact: true },
     nearby_attractions: { patterns: ["what's nearby", "nearby attractions", "tourist spots near", "restaurants near", "shopping near"] },
     get_weather: { patterns: ["what's the weather", "weather forecast", "how is the weather"] },
 };
@@ -32,7 +32,12 @@ const intents_data: Record<string, { patterns: string[] }> = {
 function findBestIntent(message: string): string {
     const cleanedMessage = message.toLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, "").trim();
     for (const intent in intents_data) {
-        if (intents_data[intent].patterns.some(pattern => cleanedMessage.includes(pattern))) {
+        if (intents_data[intent].patterns.some(pattern => {
+            if (intents_data[intent].exact) {
+                return cleanedMessage === pattern;
+            }
+            return cleanedMessage.includes(pattern);
+        })) {
             return intent;
         }
     }
@@ -174,32 +179,24 @@ export async function handleUserMessage(
             return { content: "Please specify which hotel you'd like to book." };
         }
 
-        case 'booking_procedure':
-            let hotelName = query.replace('how to book','').replace('the','').trim();
-            if (query.includes('proceed to book')) {
-                hotelName = query.replace('yes, proceed to book','').trim();
-            }
+        case 'booking_procedure': {
+            const hotelName = query.replace('how to book','').replace('the','').trim();
             const hotel = hotel_info_data.find(h => h.name.toLowerCase() === hotelName);
 
             if(hotel) {
-                try {
-                    const upsell = await suggestUpsell({
-                        hotel: hotel,
-                        currentChoice: 'a standard room'
-                    });
-                    return {
-                        content: `${upsell.suggestion}\n\nPlease fill out the form below to book your stay at **${hotel.name}**.`,
-                        isBookingForm: true,
-                        hotelData: [hotel]
-                    }
-                 } catch (e) {
-                    console.error('Upsell flow failed', e);
-                    return {
-                        content: `Please fill out the form below to book your stay at **${hotel.name}**.`,
-                        isBookingForm: true,
-                        hotelData: [hotel]
-                    };
-                 }
+                return {
+                    content: `To book the **${hotel.name}**, please fill out the form below.`,
+                    isBookingForm: true,
+                    hotelData: [hotel],
+                };
+            }
+
+            const lastBookingMessage = history.find(m => m.isBookingForm);
+            if (lastBookingMessage && lastBookingMessage.hotelData) {
+                 return {
+                    content: `You were about to book the **${'hotel' in lastBookingMessage.hotelData[0] ? lastBookingMessage.hotelData[0].hotel.name : lastBookingMessage.hotelData[0].name}**. Do you want to proceed?`,
+                    quickReplies: [`Yes, proceed to book ${'hotel' in lastBookingMessage.hotelData[0] ? lastBookingMessage.hotelData[0].hotel.name : lastBookingMessage.hotelData[0].name}`]
+                };
             }
 
             let procedureText = `Of course! Here is the booking procedure:
@@ -215,6 +212,7 @@ export async function handleUserMessage(
                 content: procedureText,
                 quickReplies: quickReplies
             };
+        }
         
         case 'ask_question': {
             const lastMessage = history[history.length - 1];
@@ -358,3 +356,5 @@ export async function handleUserMessage(
             return { content: "I'm sorry, I can't help with that. I can help find, book, or suggest hotels in Salem, Chennai, and Ooty. How can I help?" };
     }
 }
+
+    

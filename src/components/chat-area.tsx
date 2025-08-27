@@ -12,8 +12,7 @@ import { ChatInput } from './chat-input';
 const initialMessage: Message = {
   id: 'initial',
   role: 'assistant',
-  content: `👋 Hello! I'm your hotel search assistant. I can help you find hotels in Salem, Chennai, and Ooty.
-  \n\nWhat city are you interested in? Or, would you like a suggestion?`,
+  content: `👋 Hello! I'm your hotel booking assistant. Tell me what you're looking for, or choose an option below.`,
   quickReplies: ['Give me a suggestion', 'Salem', 'Chennai', 'Ooty', 'Loyalty Program'],
 };
 
@@ -158,3 +157,5 @@ a.click();
     </div>
   );
 }
+
+    
