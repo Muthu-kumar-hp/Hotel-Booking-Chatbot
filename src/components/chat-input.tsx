@@ -13,7 +13,8 @@ interface ChatInputProps {
 
 export function ChatInput({ input, setInput, handleSend, isLoading }: ChatInputProps) {
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter' && !isLoading && input.trim()) {
+      event.preventDefault();
       handleSend();
     }
   };
