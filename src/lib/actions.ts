@@ -62,9 +62,15 @@ export async function handleUserMessage(
     if (newMessage.isBookingForm && newMessage.bookingDetails) {
         const { hotel, guests, checkIn, checkOut } = newMessage.bookingDetails;
         const hotelName = 'hotel' in hotel ? hotel.hotel.name : hotel.name;
+        const bookingId = `RW-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
 
         return {
-            content: `Thank you! Your booking for ${hotelName} for ${guests} guest(s) from ${new Date(checkIn).toLocaleDateString()} to ${new Date(checkOut).toLocaleDateString()} is confirmed. A confirmation email has been sent.`,
+            content: `Thank you! Your booking for **${hotelName}** is confirmed.
+            \n\n**Booking ID:** ${bookingId}
+            \n**Guests:** ${guests}
+            \n**Check-in:** ${new Date(checkIn).toLocaleDateString()}
+            \n**Check-out:** ${new Date(checkOut).toLocaleDateString()}
+            \n\nA confirmation email has been sent.`,
             quickReplies: ['Cancel Booking']
         };
     }
