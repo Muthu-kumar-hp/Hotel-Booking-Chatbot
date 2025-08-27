@@ -14,6 +14,7 @@ const intents_data: Record<string, { patterns: string[] }> = {
     booking_procedure: { patterns: ["how to book", "booking procedure", "what is the booking process", "how do i book a hotel"] },
     ask_question: { patterns: ["what is", "what are", "do you have", "can you tell me", "is there a", "how much"] },
     cancel_booking: { patterns: ["cancel booking", "cancel my booking"] },
+    provide_booking_id: { patterns: ["rw-"] },
     confirm_cancel: { patterns: ["yes, cancel my booking", "yes cancel"] },
     deny_cancel: { patterns: ["no, don't cancel", "do not cancel", "keep my booking"] },
 };
@@ -21,7 +22,7 @@ const intents_data: Record<string, { patterns: string[] }> = {
 function findBestIntent(message: string): string {
     const cleanedMessage = message.toLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, "").trim();
     for (const intent in intents_data) {
-        if (intents_data[intent].patterns.some(pattern => cleanedMessage.includes(pattern))) {
+        if (intents_data[intent].patterns.some(pattern => cleanedMessage.startsWith(pattern))) {
             return intent;
         }
     }
@@ -71,7 +72,8 @@ export async function handleUserMessage(
             \n**Check-in:** ${new Date(checkIn).toLocaleDateString()}
             \n**Check-out:** ${new Date(checkOut).toLocaleDateString()}
             \n\nA confirmation email has been sent.`,
-            quickReplies: ['Cancel Booking']
+            quickReplies: ['Cancel Booking'],
+            bookingDetails: { ...newMessage.bookingDetails, bookingId },
         };
     }
 
@@ -81,14 +83,36 @@ export async function handleUserMessage(
         
         case 'cancel_booking':
             return { 
-                content: 'Are you sure you want to cancel your booking?',
-                quickReplies: ['Yes, cancel my booking', 'No, don\'t cancel']
+                content: 'Please enter the booking ID you wish to cancel.',
             };
         
-        case 'confirm_cancel':
+        case 'provide_booking_id': {
+            const bookingId = newMessage.content.trim().toUpperCase();
+            const bookingMessage = history.find(m => m.bookingDetails?.bookingId === bookingId);
+
+            if (bookingMessage && bookingMessage.bookingDetails) {
+                const hotelName = 'hotel' in bookingMessage.bookingDetails.hotel ? bookingMessage.bookingDetails.hotel.hotel.name : bookingMessage.bookingDetails.hotel.name;
+                return {
+                    content: `Are you sure you want to cancel your booking for **${hotelName}** (ID: ${bookingId})?`,
+                    quickReplies: [`Yes, cancel booking ${bookingId}`, `No, keep my booking`]
+                }
+            }
+            return {
+                content: 'Sorry, I could not find a booking with that ID. Please check the ID and try again.'
+            }
+        }
+        
+        case 'confirm_cancel': {
+            const bookingId = newMessage.content.split(' ').pop()?.toUpperCase();
+            if (bookingId) {
+                 return {
+                    content: `Your booking with ID **${bookingId}** has been successfully cancelled.`
+                };
+            }
             return {
                 content: 'Your booking has been successfully cancelled.'
             };
+        }
         
         case 'deny_cancel':
             return {
