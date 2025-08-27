@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -13,7 +14,7 @@ const initialMessage: Message = {
   role: 'assistant',
   content: `👋 Hello! I'm your hotel search assistant. I can help you find hotels in Salem, Chennai, and Ooty.
   \n\nWhat city are you interested in? Or, would you like a suggestion?`,
-  quickReplies: ['Give me a suggestion', 'Salem', 'Chennai', 'Ooty'],
+  quickReplies: ['Give me a suggestion', 'Salem', 'Chennai', 'Ooty', 'Loyalty Program'],
 };
 
 export function ChatArea() {

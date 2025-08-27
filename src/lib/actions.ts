@@ -1,4 +1,5 @@
 
+
 'use server';
 
 import type { Message, Hotel } from './types';
@@ -20,6 +21,7 @@ const intents_data: Record<string, { patterns: string[] }> = {
     book_taxi: { patterns: ["book a taxi", "taxi service", "airport transfer"] },
     book_sightseeing: { patterns: ["explore sightseeing", "sightseeing tours", "tourist spots"] },
     book_restaurant: { patterns: ["reserve a table", "restaurant booking", "book a restaurant"] },
+    loyalty_program: { patterns: ["loyalty program", "rewards", "points", "membership benefits"] },
 };
 
 function findBestIntent(message: string): string {
@@ -285,6 +287,17 @@ export async function handleUserMessage(
             return {
                 content: "Excellent choice! Your table has been reserved. You will receive a confirmation from the restaurant soon. Can I help with anything else?",
                 quickReplies: ['Book a Taxi', 'Explore Sightseeing']
+            };
+
+        case 'loyalty_program':
+            return {
+                content: `Our loyalty program, **MK Hotel Rewards**, offers exclusive benefits!
+\n\n- **Earn Points:** Earn points on every booking.
+\n- **Exclusive Discounts:** Get member-only rates.
+\n- **Free Upgrades:** Enjoy complimentary room upgrades (subject to availability).
+\n- **Late Check-out:** Get more flexibility with late check-out.
+\n\nWhat would you like to do next?`,
+                quickReplies: ['Find hotels in Salem', 'Suggest a hotel'],
             };
 
         default:
