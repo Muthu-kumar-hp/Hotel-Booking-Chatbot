@@ -26,5 +26,5 @@ export interface Message {
   hotelData?: (Hotel | { hotel: Hotel; reason: string })[];
   isBookingForm?: boolean;
   quickReplies?: string[];
-  bookingDetails?: Record<string, any>;
+  bookingDetails?: Record<string, any> & { bookingStatus?: 'active' | 'cancelled' };
 }

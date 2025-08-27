@@ -38,11 +38,22 @@ export function ChatArea() {
 
     try {
       const res = await handleUserMessage(messages, newUserMessage);
-      const newBotMessage: Message = {
+      const newBotMessage: Message & { updateBookingMessageId?: string; newBookingDetails?: any } = {
         id: crypto.randomUUID(),
         role: 'assistant',
         ...res,
       };
+
+      if (newBotMessage.updateBookingMessageId) {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === newBotMessage.updateBookingMessageId
+              ? { ...m, bookingDetails: newBotMessage.newBookingDetails }
+              : m
+          )
+        );
+      }
+      
       setMessages((prev) => [...prev, newBotMessage]);
     } catch (error) {
       console.error(error);
@@ -67,7 +78,7 @@ export function ChatArea() {
   const handleCancelBooking = () => {
     const lastBooking = [...messages]
       .reverse()
-      .find((m) => m.bookingDetails?.bookingId);
+      .find((m) => m.bookingDetails?.bookingId && m.bookingDetails?.bookingStatus === 'active');
 
     if (lastBooking && lastBooking.bookingDetails?.bookingId) {
       handleSend(
@@ -76,7 +87,7 @@ export function ChatArea() {
     } else {
       toast({
         title: 'No active booking found',
-        description: 'There are no bookings in the current session to cancel.',
+        description: 'There are no active bookings in the current session to cancel.',
       });
     }
   };
@@ -115,7 +126,7 @@ Thank you for booking with MK Hotel Chatbot!
       a.href = URL.createObjectURL(blob);
       a.download = `MK_Hotel_Booking_${bookingId}.txt`;
       document.body.appendChild(a);
-      a.click();
+a.click();
       document.body.removeChild(a);
     } else {
       toast({

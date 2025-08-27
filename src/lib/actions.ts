@@ -67,7 +67,7 @@ export async function handleUserMessage(
             \n- Smoking: ${smoking ? 'Yes' : 'No'}
             \n\nA confirmation email has been sent. You can cancel or download your booking using the buttons in the header.
             \n\nWhile you're here, would you like help with any travel add-ons? I can also help you rate your experience.`,
-            bookingDetails: { ...newMessage.bookingDetails, bookingId },
+            bookingDetails: { ...newMessage.bookingDetails, bookingId, bookingStatus: 'active' },
             quickReplies: ['Book a Taxi', 'Explore Sightseeing', 'Reserve a Table', 'Rate my experience'],
         };
     }
@@ -79,27 +79,26 @@ export async function handleUserMessage(
         case 'cancel_booking': {
             const bookingIdMatch = newMessage.content.match(/MK-\w+/i);
             const bookingIdToCancel = bookingIdMatch ? bookingIdMatch[0].toUpperCase() : null;
-        
+            let bookingMessageToUpdate: Message | undefined;
+
             if (bookingIdToCancel) {
-                const bookingMessage = history.find(m => m.bookingDetails?.bookingId === bookingIdToCancel);
-                 if (bookingMessage) {
-                     return {
-                        content: `Your booking with ID **${bookingIdToCancel}** has been successfully cancelled.`
-                    };
-                 }
+                 bookingMessageToUpdate = history.find(m => m.bookingDetails?.bookingId === bookingIdToCancel && m.bookingDetails?.bookingStatus === 'active');
+            } else {
+                bookingMessageToUpdate = [...history, newMessage].reverse().find(m => m.bookingDetails?.bookingId && m.bookingDetails?.bookingStatus === 'active');
             }
-            
-            const lastBookingMessage = [...history, newMessage].reverse().find(m => m.bookingDetails?.bookingId);
-            if (lastBookingMessage && lastBookingMessage.bookingDetails) {
-                const { hotel, bookingId } = lastBookingMessage.bookingDetails;
-                const hotelName = 'hotel' in hotel ? hotel.hotel.name : hotel.name;
-                return {
-                    content: `Your booking for **${hotelName}** (ID: ${bookingId}) has been cancelled.`
-                }
+        
+            if (bookingMessageToUpdate && bookingMessageToUpdate.bookingDetails) {
+                bookingMessageToUpdate.bookingDetails.bookingStatus = 'cancelled';
+                const bookingId = bookingMessageToUpdate.bookingDetails.bookingId;
+                 return {
+                    content: `Your booking with ID **${bookingId}** has been successfully cancelled.`,
+                    updateBookingMessageId: bookingMessageToUpdate.id,
+                    newBookingDetails: bookingMessageToUpdate.bookingDetails,
+                };
             }
         
             return { 
-                content: 'Sorry, I couldn\'t find a booking to cancel.',
+                content: 'Sorry, I couldn\'t find an active booking to cancel.',
             };
         }
 

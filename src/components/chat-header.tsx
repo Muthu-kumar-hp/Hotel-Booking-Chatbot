@@ -25,10 +25,16 @@ export function ChatHeader({
 }) {
   const { setTheme } = useTheme();
 
-  const hasBooking = useMemo(
+  const hasActiveBooking = useMemo(
+    () => messages.some((m) => m.bookingDetails?.bookingStatus === 'active'),
+    [messages]
+  );
+  
+  const hasAnyBooking = useMemo(
     () => messages.some((m) => m.bookingDetails?.bookingId),
     [messages]
   );
+
 
   const downloadChat = () => {
     const chatText = messages
@@ -88,28 +94,28 @@ export function ChatHeader({
           <Download className="h-5 w-5" />
           <span className="sr-only">Download Chat</span>
         </Button>
-        {hasBooking && (
-          <>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onDownloadBooking}
-              title="Download Booking Receipt"
-            >
-              <FileDown className="h-5 w-5" />
-              <span className="sr-only">Download Booking Receipt</span>
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onCancelBooking}
-              title="Cancel Booking"
-              className="text-destructive hover:text-destructive"
-            >
-              <XCircle className="h-5 w-5" />
-              <span className="sr-only">Cancel Booking</span>
-            </Button>
-          </>
+        {hasAnyBooking && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onDownloadBooking}
+            title="Download Booking Receipt"
+          >
+            <FileDown className="h-5 w-5" />
+            <span className="sr-only">Download Booking Receipt</span>
+          </Button>
+        )}
+        {hasActiveBooking && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onCancelBooking}
+            title="Cancel Booking"
+            className="text-destructive hover:text-destructive"
+          >
+            <XCircle className="h-5 w-5" />
+            <span className="sr-only">Cancel Booking</span>
+          </Button>
         )}
         <Button
           variant="ghost"
