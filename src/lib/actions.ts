@@ -4,6 +4,7 @@
 import type { Message, Hotel } from './types';
 import { suggestHotel } from '@/ai/flows/suggest-hotel';
 import { answerHotelQuestion } from '@/ai/flows/answer-hotel-question';
+import { suggestUpsell } from '@/ai/flows/suggest-upsell';
 import { hotel_info_data } from './data';
 
 const intents_data: Record<string, { patterns: string[] }> = {
@@ -154,11 +155,48 @@ export async function handleUserMessage(
         case 'book_hotel': {
              const hotel = hotel_info_data.find(h => query.includes(h.name.toLowerCase()));
              if (hotel) {
-                return {
-                    content: `Please fill out the form below to book your stay at **${hotel.name}**.`,
-                    isBookingForm: true,
-                    hotelData: [hotel]
-                };
+
+                if (query.includes('proceed with')) {
+                     return {
+                        content: `Great choice! Please fill out the form below to book your stay at **${hotel.name}**.`,
+                        isBookingForm: true,
+                        hotelData: [hotel]
+                    };
+                }
+
+                 try {
+                    const upsell = await suggestUpsell({
+                        hotel: hotel,
+                        currentChoice: 'a standard room' // This could be dynamic in a more complex scenario
+                    });
+
+                    return {
+                        content: `${upsell.suggestion}`,
+                        quickReplies: [`Book the ${upsell.newChoice}`, `No thanks, proceed with standard booking`],
+                        hotelData: [hotel] // Pass hotel data for context
+                    }
+
+                 } catch (e) {
+                    console.error('Upsell flow failed', e);
+                     // If upsell fails, just proceed to booking
+                    return {
+                        content: `Please fill out the form below to book your stay at **${hotel.name}**.`,
+                        isBookingForm: true,
+                        hotelData: [hotel]
+                    };
+                 }
+            }
+
+            if (query.includes('proceed with standard booking')) {
+                 const hotelFromHistory = history[history.length-1]?.hotelData?.[0];
+                 if(hotelFromHistory) {
+                    const hotel = 'hotel' in hotelFromHistory ? hotelFromHistory.hotel : hotelFromHistory;
+                     return {
+                        content: `No problem. Please fill out the form below to book your stay at **${hotel.name}**.`,
+                        isBookingForm: true,
+                        hotelData: [hotel]
+                    };
+                 }
             }
             return { content: "Please specify which hotel you'd like to book." };
         }
