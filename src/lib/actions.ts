@@ -7,6 +7,7 @@ import { suggestHotel } from '@/ai/flows/suggest-hotel';
 import { answerHotelQuestion } from '@/ai/flows/answer-hotel-question';
 import { suggestUpsell } from '@/ai/flows/suggest-upsell';
 import { suggestAttractions } from '@/ai/flows/suggest-attractions';
+import { getWeatherForecast } from '@/ai/flows/get-weather-forecast';
 import { hotel_info_data } from './data';
 
 const intents_data: Record<string, { patterns: string[] }> = {
@@ -24,6 +25,7 @@ const intents_data: Record<string, { patterns: string[] }> = {
     book_restaurant: { patterns: ["reserve a table", "restaurant booking", "book a restaurant"] },
     loyalty_program: { patterns: ["loyalty program", "rewards", "points", "membership benefits"] },
     nearby_attractions: { patterns: ["what's nearby", "nearby attractions", "tourist spots near", "restaurants near", "shopping near"] },
+    get_weather: { patterns: ["what's the weather", "weather forecast", "how is the weather"] },
 };
 
 function findBestIntent(message: string): string {
@@ -309,6 +311,44 @@ export async function handleUserMessage(
                 return { content: 'Sorry, I am having trouble finding nearby attractions right now.' };
             }
         }
+        
+        case 'get_weather': {
+            let hotel: Hotel | undefined;
+            const hotelNameMatch = query.match(/weather at (.*)/) || query.match(/weather in (.*)/);
+            const hotelName = hotelNameMatch ? hotelNameMatch[1].replace('?','').trim() : '';
+
+            if (hotelName) {
+                hotel = hotel_info_data.find(h => h.name.toLowerCase() === hotelName) || hotel_info_data.find(h => h.city.toLowerCase() === hotelName);
+            } else {
+                const lastMessageWithHotel = [...history, newMessage].reverse().find(m => m.hotelData && m.hotelData.length > 0);
+                if (lastMessageWithHotel?.hotelData) {
+                    const hotelData = lastMessageWithHotel.hotelData[0];
+                    hotel = 'hotel' in hotelData ? hotelData.hotel : hotelData;
+                }
+            }
+
+            if (!hotel) {
+                return { 
+                    content: "Which city's weather would you like to know? I can fetch forecasts for Salem, Chennai, or Ooty.",
+                    quickReplies: ['Salem', 'Chennai', 'Ooty']
+                };
+            }
+
+            try {
+                const result = await getWeatherForecast({ city: hotel.city });
+                const { temperature, condition, summary } = result.forecast;
+                return {
+                    content: `Here's the weather forecast for **${hotel.city}**:
+                    \n- **Condition:** ${condition}
+                    \n- **Temperature:** ${temperature}
+                    \n\n${summary}`
+                };
+            } catch (e) {
+                console.error('Weather forecast failed', e);
+                return { content: 'Sorry, I am having trouble getting the weather forecast right now.' };
+            }
+        }
+
 
         default:
              if (query.includes('rate my experience')) {

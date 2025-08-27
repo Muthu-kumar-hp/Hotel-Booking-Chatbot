@@ -5,3 +5,4 @@ import '@/ai/flows/suggest-hotel.ts';
 import '@/ai/flows/answer-hotel-question.ts';
 import '@/ai/flows/suggest-upsell.ts';
 import '@/ai/flows/suggest-attractions.ts';
+import '@/ai/flows/get-weather-forecast.ts';
