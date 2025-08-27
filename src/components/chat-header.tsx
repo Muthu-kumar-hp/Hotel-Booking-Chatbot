@@ -1,3 +1,4 @@
+
 'use client';
 
 import { RotateCw, Download, Moon, Sun, XCircle, FileDown } from 'lucide-react';
@@ -57,13 +58,13 @@ export function ChatHeader({
 
   return (
     <header className="flex h-20 shrink-0 items-center justify-between border-b bg-primary/10 px-4 md:px-6">
-      <div className="text-primary">
-        <h1 className="text-xl font-bold tracking-tighter">🏨 MK Hotel Chatbot</h1>
-        <p className="text-sm text-primary/80">
+      <div className="flex-1 text-primary">
+        <h1 className="text-lg font-bold tracking-tighter sm:text-xl">🏨 MK Hotel Chatbot</h1>
+        <p className="text-xs text-primary/80 sm:text-sm">
           Your guide to finding the perfect stay
         </p>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 sm:gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon">
@@ -130,3 +131,5 @@ export function ChatHeader({
     </header>
   );
 }
+
+    

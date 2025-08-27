@@ -90,7 +90,7 @@ export function BookingForm({ hotel, onSubmit }: BookingFormProps) {
             </FormItem>
           )}
         />
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField
             control={form.control}
             name="email"
@@ -119,7 +119,7 @@ export function BookingForm({ hotel, onSubmit }: BookingFormProps) {
             />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField
             control={form.control}
             name="checkIn"
@@ -244,7 +244,7 @@ export function BookingForm({ hotel, onSubmit }: BookingFormProps) {
                         <RadioGroup
                         onValueChange={field.onChange}
                         defaultValue={field.value}
-                        className="flex items-center space-x-4"
+                        className="flex flex-col sm:flex-row sm:items-center sm:space-x-4"
                         >
                         <FormItem className="flex items-center space-x-2 space-y-0">
                             <FormControl>
@@ -309,7 +309,7 @@ export function BookingForm({ hotel, onSubmit }: BookingFormProps) {
                     </FormItem>
                 )}
             />
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                  <FormField
                     control={form.control}
                     name="expiryDate"
@@ -345,3 +345,5 @@ export function BookingForm({ hotel, onSubmit }: BookingFormProps) {
     </Form>
   );
 }
+
+    
