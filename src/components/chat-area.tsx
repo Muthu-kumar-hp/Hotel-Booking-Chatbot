@@ -106,13 +106,13 @@ Check-in: ${new Date(checkIn).toLocaleDateString()}
 Check-out: ${new Date(checkOut).toLocaleDateString()}
 Number of Guests: ${guests}
 
-Thank you for booking with RoamWell AI!
+Thank you for booking with MK Hotel Chatbot!
       `.trim();
 
       const blob = new Blob([receiptContent], { type: 'text/plain' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = `RoamWell_Booking_${bookingId}.txt`;
+      a.download = `MK_Hotel_Booking_${bookingId}.txt`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

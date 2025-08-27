@@ -43,7 +43,7 @@ export function ChatHeader({
     const blob = new Blob([chatText], { type: 'text/plain' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'RoamWell_Chat_History.txt';
+    a.download = 'MK_Hotel_Chat_History.txt';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -52,7 +52,7 @@ export function ChatHeader({
   return (
     <header className="flex h-20 shrink-0 items-center justify-between border-b bg-primary/10 px-4 md:px-6">
       <div className="text-primary">
-        <h1 className="text-xl font-bold tracking-tighter">🏨 RoamWell AI</h1>
+        <h1 className="text-xl font-bold tracking-tighter">🏨 MK Hotel Chatbot</h1>
         <p className="text-sm text-primary/80">
           Your guide to finding the perfect stay
         </p>

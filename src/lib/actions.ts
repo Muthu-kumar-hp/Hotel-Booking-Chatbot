@@ -61,7 +61,7 @@ export async function handleUserMessage(
     if (newMessage.isBookingForm && newMessage.bookingDetails) {
         const { hotel, guests, checkIn, checkOut } = newMessage.bookingDetails;
         const hotelName = 'hotel' in hotel ? hotel.hotel.name : hotel.name;
-        const bookingId = `RW-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+        const bookingId = `MK-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
 
         return {
             content: `Thank you! Your booking for **${hotelName}** is confirmed.
@@ -81,7 +81,7 @@ export async function handleUserMessage(
             return { content: 'Hello there! How can I help you with your hotel search today?' };
         
         case 'cancel_booking': {
-            const bookingIdMatch = newMessage.content.match(/RW-\w+/i);
+            const bookingIdMatch = newMessage.content.match(/MK-\w+/i);
             const bookingIdToCancel = bookingIdMatch ? bookingIdMatch[0].toUpperCase() : null;
         
             if (bookingIdToCancel) {

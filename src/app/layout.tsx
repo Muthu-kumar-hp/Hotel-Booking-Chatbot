@@ -8,7 +8,7 @@ import { Toaster } from '@/components/ui/toaster';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
-  title: 'RoamWell AI',
+  title: 'MK Hotel Chatbot',
   description: 'Your personal hotel booking assistant',
 };
 
