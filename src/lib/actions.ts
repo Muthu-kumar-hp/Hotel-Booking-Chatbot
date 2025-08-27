@@ -11,7 +11,7 @@ const intents_data: Record<string, { patterns: string[] }> = {
     view_details: { patterns: ["view details for", "details of", "tell me more about", "more details"] },
     suggest_hotel: { patterns: ["suggest a hotel", "what do you recommend", "cheap and best", "recommend a hotel", "best hotels", "luxury hotel", "cheap hotel", "high-rated hotel", "suggestion", "give me a suggestion"] },
     book_hotel: { patterns: ["book a room", "book the hotel", "i want to book", "booking"] },
-    booking_procedure: { patterns: ["how to book", "booking procedure", "what is the booking process", "how do i book a hotel"] },
+    booking_procedure: { patterns: ["how to book", "booking procedure", "what is the booking process", "how do i book a hotel", "procedure"] },
     ask_question: { patterns: ["what is", "what are", "do you have", "can you tell me", "is there a", "how much"] },
     submit_feedback: { patterns: ["⭐", "⭐⭐", "⭐⭐⭐", "⭐⭐⭐⭐", "⭐⭐⭐⭐⭐"] },
     cancel_booking: { patterns: ["cancel booking", "cancel my booking"] },
@@ -20,7 +20,7 @@ const intents_data: Record<string, { patterns: string[] }> = {
 function findBestIntent(message: string): string {
     const cleanedMessage = message.toLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, "").trim();
     for (const intent in intents_data) {
-        if (intents_data[intent].patterns.some(pattern => cleanedMessage.startsWith(pattern))) {
+        if (intents_data[intent].patterns.some(pattern => cleanedMessage.includes(pattern))) {
             return intent;
         }
     }
