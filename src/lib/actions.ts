@@ -84,10 +84,27 @@ export async function handleUserMessage(
         case 'greeting':
             return { content: 'Hello there! How can I help you with your hotel search today?' };
         
-        case 'cancel_booking':
+        case 'cancel_booking': {
+            const bookingIdMatch = newMessage.content.match(/RW-\w+/i);
+             if (bookingIdMatch) {
+                const bookingId = bookingIdMatch[0].toUpperCase();
+                 return {
+                    content: `Your booking with ID **${bookingId}** has been successfully cancelled.`
+                };
+            }
+
+            const lastBookingMessage = [...history].reverse().find(m => m.bookingDetails?.bookingId);
+            if (lastBookingMessage && lastBookingMessage.bookingDetails) {
+                 const { bookingId, hotel } = lastBookingMessage.bookingDetails;
+                 const hotelName = 'hotel' in hotel ? hotel.hotel.name : hotel.name;
+                 return {
+                    content: `Your booking for **${hotelName}** (ID: ${bookingId}) has been cancelled.`
+                 }
+            }
             return { 
-                content: 'Please enter the booking ID you wish to cancel.',
+                content: 'If you want to cancel a booking, please provide the booking ID.',
             };
+        }
         
         case 'provide_booking_id': {
             const bookingId = newMessage.content.trim().toUpperCase();
