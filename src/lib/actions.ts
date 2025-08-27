@@ -144,15 +144,6 @@ export async function handleUserMessage(
         case 'book_hotel': {
              const hotel = hotel_info_data.find(h => query.includes(h.name.toLowerCase()));
              if (hotel) {
-
-                if (query.includes('proceed with')) {
-                     return {
-                        content: `Great choice! Please fill out the form below to book your stay at **${hotel.name}**.`,
-                        isBookingForm: true,
-                        hotelData: [hotel]
-                    };
-                }
-
                  try {
                     const upsell = await suggestUpsell({
                         hotel: hotel,
@@ -160,8 +151,8 @@ export async function handleUserMessage(
                     });
 
                     return {
-                        content: `${upsell.suggestion}`,
-                        quickReplies: [`Book the ${upsell.newChoice}`, `No thanks, proceed with standard booking`],
+                        content: `${upsell.suggestion}\n\nPlease fill out the form below to book your stay at **${hotel.name}**.`,
+                        isBookingForm: true,
                         hotelData: [hotel] // Pass hotel data for context
                     }
 
@@ -176,17 +167,6 @@ export async function handleUserMessage(
                  }
             }
 
-            if (query.includes('proceed with standard booking')) {
-                 const hotelFromHistory = history[history.length-1]?.hotelData?.[0];
-                 if(hotelFromHistory) {
-                    const hotel = 'hotel' in hotelFromHistory ? hotelFromHistory.hotel : hotelFromHistory;
-                     return {
-                        content: `No problem. Please fill out the form below to book your stay at **${hotel.name}**.`,
-                        isBookingForm: true,
-                        hotelData: [hotel]
-                    };
-                 }
-            }
             return { content: "Please specify which hotel you'd like to book." };
         }
 
