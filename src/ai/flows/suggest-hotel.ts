@@ -13,7 +13,7 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const SuggestHotelInputSchema = z.object({
-  preferences: z.string().describe('The user\u0027s preferences for hotel suggestions, including price range, rating, and location.'),
+  preferences: z.string().describe('The user’s preferences for hotel suggestions, including price range, rating, location, and amenities.'),
   hotelData: z.string().describe('The data for available hotels in JSON format.'),
 });
 export type SuggestHotelInput = z.infer<typeof SuggestHotelInputSchema>;
@@ -32,18 +32,26 @@ const suggestHotelPrompt = ai.definePrompt({
   name: 'suggestHotelPrompt',
   input: {schema: SuggestHotelInputSchema},
   output: {schema: SuggestHotelOutputSchema},
-  prompt: `Based on the following user preferences: {{{preferences}}}, and the following hotel data: {{{hotelData}}}, recommend hotels that match these preferences.
+  prompt: `You are an intelligent hotel booking assistant. Your goal is to recommend hotels that best match the user's preferences.
 
-        Provide the response as a JSON array of hotel objects, including the hotel_id and a reason for the suggestion.
+Analyze the user's request for details like city, price (e.g., "cheap," "luxury"), desired rating ("high-rated," "best"), and specific amenities or features (e.g., "swimming pool," "near the beach," "sea view").
 
-        JSON Format:
-        [
-            {
-                "hotel_id": "HTL001",
-                "reason": "This hotel is highly-rated and offers great value."
-            }
-        ]
-        `, // Updated prompt
+Based on the following user preferences:
+"{{{preferences}}}"
+
+And the available hotel data:
+"{{{hotelData}}}"
+
+Recommend up to 3 hotels that are the best fit. For each recommendation, provide the hotel_id and a brief, compelling reason explaining why it matches their request.
+
+Example Response Format:
+[
+    {
+        "hotel_id": "HTL002",
+        "reason": "This luxurious beachfront hotel has stunning sea views and a pool, matching your request perfectly."
+    }
+]
+        `,
 });
 
 const suggestHotelFlow = ai.defineFlow(
