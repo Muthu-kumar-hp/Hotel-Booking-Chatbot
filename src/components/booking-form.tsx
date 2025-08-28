@@ -345,5 +345,3 @@ export function BookingForm({ hotel, onSubmit }: BookingFormProps) {
     </Form>
   );
 }
-
-    

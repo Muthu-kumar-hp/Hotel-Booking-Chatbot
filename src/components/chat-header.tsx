@@ -131,5 +131,3 @@ export function ChatHeader({
     </header>
   );
 }
-
-    

@@ -53,6 +53,9 @@
   * {
     @apply border-border;
   }
+  html {
+    overflow-y: hidden;
+  }
   body {
     @apply bg-background text-foreground;
     background-image: url('https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=2862&auto=format&fit=crop');
