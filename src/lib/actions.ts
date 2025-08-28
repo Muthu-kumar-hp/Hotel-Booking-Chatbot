@@ -11,7 +11,7 @@ import { getWeatherForecast } from '@/ai/flows/get-weather-forecast';
 import { hotel_info_data } from './data';
 
 const intents_data: Record<string, { patterns: string[], exact?: boolean }> = {
-    greeting: { patterns: ["hi", "hello", "hey", "greetings"] },
+    greeting: { patterns: ["hi", "hello", "hey,", "greetings"] },
     find_hotels: { patterns: ["show me hotels in", "find me hotels in", "hotels in", "looking for a hotel in", "want a room in", "cheap hotel", "luxury hotel", "high-rated hotel"] },
     view_details: { patterns: ["tell me more about", "more details on"] },
     suggest_hotel: { patterns: ["suggest a hotel", "what do you recommend", "cheap and best", "recommend a hotel", "best hotels", "suggestion", "give me a suggestion"], exact: true },
