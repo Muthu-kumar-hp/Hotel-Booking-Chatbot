@@ -63,6 +63,7 @@ export function ChatArea() {
       });
     } finally {
       setIsLoading(false);
+      setInput('');
     }
   };
 
