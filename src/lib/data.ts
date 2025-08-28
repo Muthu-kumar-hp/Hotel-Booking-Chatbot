@@ -1,3 +1,4 @@
+
 import type { Hotel } from '@/lib/types';
 
 export const hotel_info_data: Hotel[] = [
@@ -66,3 +67,5 @@ export const hotel_info_data: Hotel[] = [
         "available_rooms": 40, "rating": 4.1, "location_url": "https://www.google.com/maps?q=13.0827,80.2707"
     }
 ];
+
+    
