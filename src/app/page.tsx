@@ -4,7 +4,7 @@ import { ChatArea } from '@/components/chat-area';
 
 export default function Home() {
   return (
-    <main className="flex h-screen flex-col">
+    <main className="flex h-[100svh] flex-col">
       <ChatArea />
     </main>
   );

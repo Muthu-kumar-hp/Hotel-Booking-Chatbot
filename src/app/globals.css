@@ -68,7 +68,7 @@
 }
 
 .chat-container {
-  @apply flex flex-1 flex-col w-full;
+  @apply flex flex-1 flex-col w-full h-full max-h-full;
   background-color: hsl(var(--card) / 0.8);
   backdrop-filter: blur(8px);
 }

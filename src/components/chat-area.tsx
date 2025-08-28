@@ -137,24 +137,26 @@ a.click();
   };
 
   return (
-    <div className="chat-container">
-      <ChatHeader
-        resetChat={resetChat}
-        messages={messages}
-        onCancelBooking={handleCancelBooking}
-        onDownloadBooking={handleDownloadBooking}
-      />
-      <ChatMessages
-        messages={messages}
-        isLoading={isLoading}
-        onQuickReply={handleQuickReply}
-      />
-      <ChatInput
-        input={input}
-        setInput={setInput}
-        handleSend={() => handleSend(input)}
-        isLoading={isLoading}
-      />
+    <div className="flex flex-1 flex-col">
+      <div className="chat-container">
+        <ChatHeader
+          resetChat={resetChat}
+          messages={messages}
+          onCancelBooking={handleCancelBooking}
+          onDownloadBooking={handleDownloadBooking}
+        />
+        <ChatMessages
+          messages={messages}
+          isLoading={isLoading}
+          onQuickReply={handleQuickReply}
+        />
+        <ChatInput
+          input={input}
+          setInput={setInput}
+          handleSend={() => handleSend(input)}
+          isLoading={isLoading}
+        />
+      </div>
     </div>
   );
 }
