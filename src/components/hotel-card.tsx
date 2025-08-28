@@ -72,7 +72,7 @@ export function HotelCard({ hotel, reason, onQuickReply }: HotelCardProps) {
 
 export function HotelDetailCard({ hotel, onQuickReply }: HotelCardProps) {
   const handleBookNow = () => {
-    onQuickReply(`How to book the ${hotel.name}?`);
+    onQuickReply(`Book the ${hotel.name}`);
   };
 
   const handleNearby = () => {
@@ -134,5 +134,3 @@ export function HotelDetailCard({ hotel, onQuickReply }: HotelCardProps) {
     </div>
   )
 }
-
-    
