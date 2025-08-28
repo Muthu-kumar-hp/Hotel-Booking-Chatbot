@@ -146,10 +146,10 @@ export async function handleUserMessage(
 
         case 'view_details': {
             const hotelNameMatch = query.replace('tell me more about', '').trim();
-            const hotel = hotel_info_data.find(h => h.name.toLowerCase() === hotelNameMatch);
+            const hotel = hotel_info_data.find(h => h.name.toLowerCase() === hotelNameMatch.toLowerCase());
             if (hotel) {
                 return {
-                    content: `Here are the details for ${hotel.name}:`,
+                    content: `Here are the details for **${hotel.name}**:`,
                     hotelData: [hotel],
                 };
             }
@@ -161,12 +161,31 @@ export async function handleUserMessage(
             const hotel = hotel_info_data.find(h => h.name.toLowerCase() === hotelNameMatch);
 
              if (hotel) {
-                return {
-                    content: `Please fill out the form below to book your stay at **${hotel.name}**.`,
+                try {
+                    const upsell = await suggestUpsell({ hotel, currentChoice: "a standard room" });
+                    return {
+                        content: `Great choice! Before we finalize, ${upsell.suggestion}`,
+                        quickReplies: [`Book the ${upsell.newChoice}`, `No thanks, proceed with booking`],
+                        hotelData: [hotel]
+                    };
+                } catch(e) {
+                     return {
+                        content: `Please fill out the form below to book your stay at **${hotel.name}**.`,
+                        isBookingForm: true,
+                        hotelData: [hotel]
+                    };
+                }
+            }
+            // This is the case where we are proceeding after an upsell
+            const lastMessage = history[history.length - 1];
+            if(lastMessage?.hotelData) {
+                 return {
+                    content: `Please fill out the form below to book your stay at **${'hotel' in lastMessage.hotelData[0] ? lastMessage.hotelData[0].hotel.name : lastMessage.hotelData[0].name}**.`,
                     isBookingForm: true,
-                    hotelData: [hotel]
+                    hotelData: lastMessage.hotelData
                 };
             }
+
 
             return { content: "Please specify which hotel you'd like to book." };
         }
