@@ -13,9 +13,9 @@ import { hotel_info_data } from './data';
 const intents_data: Record<string, { patterns: string[], exact?: boolean }> = {
     greeting: { patterns: ["hi", "hello", "hey", "greetings"] },
     find_hotels: { patterns: ["show me hotels in", "find me hotels in", "hotels in", "looking for a hotel in", "want a room in", "cheap hotel", "luxury hotel", "high-rated hotel"] },
-    view_details: { patterns: ["tell me more about", "more details about", "details for", "details of"] },
+    view_details: { patterns: ["tell me more about", "more details on"] },
     suggest_hotel: { patterns: ["suggest a hotel", "what do you recommend", "cheap and best", "recommend a hotel", "best hotels", "suggestion", "give me a suggestion"], exact: true },
-    book_hotel: { patterns: ["book a room", "book the hotel", "i want to book", "booking", "proceed to book"] },
+    book_hotel: { patterns: ["book a room", "book the hotel", "i want to book", "booking", "proceed to book", "book"] },
     booking_procedure: { patterns: ["how to book", "booking procedure", "what is the booking process", "how do i book a hotel", "procedure"] },
     ask_question: { patterns: ["what is", "what are", "do you have", "can you tell me", "is there a", "how much"] },
     rate_experience: { patterns: ["rate my experience", "rate your experience", "submit feedback"] },
@@ -31,16 +31,21 @@ const intents_data: Record<string, { patterns: string[], exact?: boolean }> = {
 
 function findBestIntent(message: string): string {
     const cleanedMessage = message.toLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, "").trim();
+    
+    // Check for exact matches first
     for (const intent in intents_data) {
-        if (intents_data[intent].patterns.some(pattern => {
-            if (intents_data[intent].exact) {
-                return cleanedMessage === pattern;
-            }
-            return cleanedMessage.includes(pattern);
-        })) {
+        if (intents_data[intent].exact && intents_data[intent].patterns.some(p => cleanedMessage === p)) {
             return intent;
         }
     }
+
+    // Check for partial matches
+    for (const intent in intents_data) {
+        if (!intents_data[intent].exact && intents_data[intent].patterns.some(p => cleanedMessage.includes(p))) {
+            return intent;
+        }
+    }
+
     const cities = ['salem', 'chennai', 'ooty'];
      if (cities.some(city => cleanedMessage.includes(city)) || cleanedMessage.includes('hotel')) {
         return 'find_hotels';
@@ -140,7 +145,8 @@ export async function handleUserMessage(
         }
 
         case 'view_details': {
-            const hotel = hotel_info_data.find(h => query.includes(h.name.toLowerCase()));
+            const hotelNameMatch = query.replace('tell me more about', '').trim();
+            const hotel = hotel_info_data.find(h => h.name.toLowerCase() === hotelNameMatch);
             if (hotel) {
                 return {
                     content: `Here are the details for ${hotel.name}:`,
@@ -151,7 +157,9 @@ export async function handleUserMessage(
         }
 
         case 'book_hotel': {
-             const hotel = hotel_info_data.find(h => query.includes(h.name.toLowerCase()));
+            const hotelNameMatch = query.replace('book the', '').trim();
+            const hotel = hotel_info_data.find(h => h.name.toLowerCase() === hotelNameMatch);
+
              if (hotel) {
                  try {
                     const upsell = await suggestUpsell({
@@ -240,6 +248,11 @@ export async function handleUserMessage(
             };
 
         case 'rate_experience':
+            if (newMessage.content.includes('⭐')) {
+                return {
+                    content: "Thanks for your feedback! I'm glad I could help. Is there anything else you need?"
+                };
+            }
              return {
                 content: "How would you rate your experience?",
                 quickReplies: ['⭐', '⭐⭐', '⭐⭐⭐', '⭐⭐⭐⭐', '⭐⭐⭐⭐⭐'],
@@ -356,5 +369,3 @@ export async function handleUserMessage(
             return { content: "I'm sorry, I can't help with that. I can help find, book, or suggest hotels in Salem, Chennai, and Ooty. How can I help?" };
     }
 }
-
-    
