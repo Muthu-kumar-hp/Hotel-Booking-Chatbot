@@ -161,27 +161,11 @@ export async function handleUserMessage(
             const hotel = hotel_info_data.find(h => h.name.toLowerCase() === hotelNameMatch);
 
              if (hotel) {
-                 try {
-                    const upsell = await suggestUpsell({
-                        hotel: hotel,
-                        currentChoice: 'a standard room' // This could be dynamic in a more complex scenario
-                    });
-
-                    return {
-                        content: `${upsell.suggestion}\n\nPlease fill out the form below to book your stay at **${hotel.name}**.`,
-                        isBookingForm: true,
-                        hotelData: [hotel] // Pass hotel data for context
-                    }
-
-                 } catch (e) {
-                    console.error('Upsell flow failed', e);
-                     // If upsell fails, just proceed to booking
-                    return {
-                        content: `Please fill out the form below to book your stay at **${hotel.name}**.`,
-                        isBookingForm: true,
-                        hotelData: [hotel]
-                    };
-                 }
+                return {
+                    content: `Please fill out the form below to book your stay at **${hotel.name}**.`,
+                    isBookingForm: true,
+                    hotelData: [hotel]
+                };
             }
 
             return { content: "Please specify which hotel you'd like to book." };
