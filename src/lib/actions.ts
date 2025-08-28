@@ -188,8 +188,8 @@ export async function handleUserMessage(
         }
 
         case 'booking_procedure': {
-            const hotelName = query.replace('how to book','').replace('the','').trim();
-            const hotel = hotel_info_data.find(h => h.name.toLowerCase() === hotelName);
+            const hotelNameMatch = query.replace('how to book','').replace('the','').trim();
+            const hotel = hotel_info_data.find(h => h.name.toLowerCase() === hotelNameMatch);
 
             if(hotel) {
                 return {
