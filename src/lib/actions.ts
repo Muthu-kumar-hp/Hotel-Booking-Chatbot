@@ -158,32 +158,16 @@ export async function handleUserMessage(
 
         case 'book_hotel': {
             const lastMessage = history[history.length - 1];
-            const proceedToBooking = query.includes('deluxe') || query.includes('suite') || query.includes('no thanks');
-        
-            if (!proceedToBooking) {
-                const hotelNameMatch = query.replace('book the', '').trim();
-                const hotel = hotel_info_data.find(h => h.name.toLowerCase() === hotelNameMatch.toLowerCase());
-                
-                if (hotel) {
-                    try {
-                        const upsell = await suggestUpsell({ hotel, currentChoice: "a standard room" });
-                        return {
-                            content: `Great choice! Before we finalize, ${upsell.suggestion}`,
-                            quickReplies: [`Book the ${upsell.newChoice}`, `No thanks, proceed with booking`],
-                            hotelData: [hotel]
-                        };
-                    } catch(e) {
-                         // Fallback to booking form if upsell fails
-                    }
-                }
-            }
-            
-            // This is the case where we are proceeding after an upsell or if upsell failed
-            if(lastMessage?.hotelData) {
-                 return {
-                    content: `Please fill out the form below to book your stay at **${'hotel' in lastMessage.hotelData[0] ? lastMessage.hotelData[0].hotel.name : lastMessage.hotelData[0].name}**.`,
+            const hotelNameMatch = query.replace('book the', '').trim();
+            const hotel = hotel_info_data.find(h => h.name.toLowerCase() === hotelNameMatch.toLowerCase());
+
+            let hotelToBook: (Hotel | { hotel: Hotel, reason: string; })[] | undefined = hotel ? [hotel] : lastMessage?.hotelData;
+
+            if (hotelToBook) {
+                return {
+                    content: `Please fill out the form below to book your stay at **${'hotel' in hotelToBook[0] ? hotelToBook[0].hotel.name : hotelToBook[0].name}**.`,
                     isBookingForm: true,
-                    hotelData: lastMessage.hotelData
+                    hotelData: hotelToBook
                 };
             }
             
